@@ -421,9 +421,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // הגדרות Firebase החדשות
         const firebaseConfig = {
             apiKey: "AIzaSyBnRk-Os6EvJcFIdpl-lICc9w-E4pQ74nE",
             authDomain: "linkmanager-fdac5.firebaseapp.com",
@@ -482,27 +481,81 @@
         async function loadDataFromFirestore() {
             if (!user) return;
             document.getElementById('dataLoader').classList.remove('hidden');
+            coupons = [];
+            
             try {
-                const docRef = doc(db, "wallets", user.uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    coupons = docSnap.data().coupons || [];
+                // בדיקת מבנה חדש
+                const couponsRef = collection(db, "wallets", user.uid, "coupons");
+                const querySnapshot = await getDocs(couponsRef);
+
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        coupons.push({ id: doc.id, ...doc.data() });
+                    });
+                    // המרה ל-Number אם ה-ID מספרי (תאימות לאחור)
+                    coupons = coupons.map(c => ({...c, id: isNaN(c.id) ? c.id : Number(c.id)}));
                 } else {
-                    if (user.email === 'meirhadad74@gmail.com') coupons = defaultCoupons;
-                    else coupons = [];
-                    await saveToFirestore();
+                    // מיגרציה מנתונים ישנים
+                    console.log("בודק מיגרציה...");
+                    const oldDocRef = doc(db, "wallets", user.uid);
+                    const oldDocSnap = await getDoc(oldDocRef);
+
+                    if (oldDocSnap.exists() && oldDocSnap.data().coupons && oldDocSnap.data().coupons.length > 0) {
+                        const oldData = oldDocSnap.data().coupons;
+                        const batch = writeBatch(db);
+                        
+                        oldData.forEach(c => {
+                            const couponId = String(c.id || Date.now());
+                            const newDocRef = doc(db, "wallets", user.uid, "coupons", couponId);
+                            batch.set(newDocRef, c);
+                            coupons.push(c);
+                        });
+                        
+                        await batch.commit();
+                        console.log("מיגרציה הושלמה!");
+                    } else {
+                        if (user.email === 'meirhadad74@gmail.com') {
+                            coupons = defaultCoupons;
+                            defaultCoupons.forEach(c => saveCouponToFirestore(c));
+                        }
+                    }
                 }
+                
                 renderCoupons();
                 updateTotal();
-            } catch (e) { console.error("Error loading", e); } 
-            finally { document.getElementById('dataLoader').classList.add('hidden'); }
+            } catch (e) { 
+                console.error("Error loading data:", e); 
+            } 
+            finally { 
+                document.getElementById('dataLoader').classList.add('hidden'); 
+            }
         }
 
-        async function saveToFirestore() {
+        async function saveCouponToFirestore(coupon) {
             if (!user) return;
-            await setDoc(doc(db, "wallets", user.uid), { coupons, lastUpdated: new Date() });
-            renderCoupons();
-            updateTotal();
+            try {
+                const couponId = String(coupon.id);
+                await setDoc(doc(db, "wallets", user.uid, "coupons", couponId), coupon);
+                // עדכון timestamp ראשי
+                setDoc(doc(db, "wallets", user.uid), { lastUpdated: new Date() }, { merge: true });
+            } catch (e) { console.error("Error saving:", e); }
+        }
+
+        async function deleteCouponFromFirestore(couponId) {
+            if (!user) return;
+            try {
+                await deleteDoc(doc(db, "wallets", user.uid, "coupons", String(couponId)));
+            } catch (e) { console.error("Error deleting:", e); }
+        }
+
+        async function saveImportedCoupons(newCoupons) {
+             if (!user) return;
+             const batch = writeBatch(db);
+             newCoupons.forEach(c => {
+                 const ref = doc(db, "wallets", user.uid, "coupons", String(c.id));
+                 batch.set(ref, c);
+             });
+             await batch.commit();
         }
 
         function checkExpirations() {
@@ -521,7 +574,6 @@
             });
         }
 
-        // --- התחברות לגוגל ---
         window.handleGoogleLogin = async () => {
             try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
             catch (e) { document.getElementById('authError').innerText = e.message; document.getElementById('authError').classList.remove('hidden'); }
@@ -532,14 +584,11 @@
             toggleUserMenu(); 
         };
 
-        // --- החלפת משתמש עם מסך בחירת חשבון ---
         window.handleSwitchAccount = async () => {
-            await signOut(auth); // קודם מנתקים
+            await signOut(auth); 
             const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' }); // מאלץ מסך בחירה
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (e) { console.error(e); }
+            provider.setCustomParameters({ prompt: 'select_account' }); 
+            try { await signInWithPopup(auth, provider); } catch (e) { console.error(e); }
             toggleUserMenu(); 
         };
 
@@ -587,7 +636,7 @@
 
         window.openEditModal = (id) => {
             resetForm();
-            const coupon = coupons.find(c => c.id === id);
+            const coupon = coupons.find(c => c.id == id);
             if (!coupon) return;
             document.getElementById('modalTitle').innerText = 'עריכת הטבה';
             document.getElementById('editId').value = coupon.id;
@@ -664,7 +713,6 @@
         function parseCustomText(text) {
             const items = [];
             const blocks = text.split('----------------------------------------');
-            
             blocks.forEach(block => {
                 if(!block.trim()) return;
                 const lines = block.split('\n').map(l => l.trim()).filter(l => l);
@@ -687,7 +735,6 @@
                     if(key === 'רשימת סניפים') newItem.stores = val ? val.split(',').map(s=>s.trim()) : [];
                     if(key === 'תמונה (לא לגעת)') newItem.image = val;
                 });
-
                 if(newItem.store) items.push(newItem);
             });
             return items;
@@ -726,37 +773,38 @@
 
                     if (Array.isArray(imported)) {
                         const backup = JSON.parse(JSON.stringify(coupons));
-                        let addedCount = 0;
+                        let addedItems = [];
                         let skippedCount = 0;
 
-                        const newItems = imported.filter(newItem => {
+                        imported.forEach(newItem => {
                             const exists = coupons.some(existing => 
                                 existing.store === newItem.store &&
                                 existing.value === newItem.value &&
-                                (existing.code === newItem.code || (!existing.code && !newItem.code)) &&
-                                existing.exp === newItem.exp
+                                (existing.code === newItem.code || (!existing.code && !newItem.code))
                             );
                             
                             if (exists) {
                                 skippedCount++;
-                                return false;
+                            } else {
+                                const itemToAdd = {
+                                    ...newItem,
+                                    id: Date.now() + Math.random()
+                                };
+                                addedItems.push(itemToAdd);
                             }
-                            addedCount++;
-                            return true;
-                        }).map(item => ({
-                            ...item,
-                            id: Date.now() + Math.random() // Ensure fresh IDs
-                        }));
+                        });
 
-                        if (addedCount > 0) {
-                            coupons = [...coupons, ...newItems];
-                            await saveToFirestore();
+                        if (addedItems.length > 0) {
+                            coupons = [...coupons, ...addedItems];
+                            await saveImportedCoupons(addedItems);
                             renderCoupons();
                             updateTotal();
                             
-                            showUndoToast(`נוספו ${addedCount} פריטים (${skippedCount} כפולים סוננו)`, async () => {
+                            showUndoToast(`נוספו ${addedItems.length} פריטים`, async () => {
+                                for(let item of addedItems) {
+                                    await deleteCouponFromFirestore(item.id);
+                                }
                                 coupons = backup;
-                                await saveToFirestore();
                                 renderCoupons();
                                 updateTotal();
                             });
@@ -775,10 +823,11 @@
         };
 
         window.togglePin = async (id) => {
-            const idx = coupons.findIndex(c => c.id === id);
+            const idx = coupons.findIndex(c => c.id == id);
             if (idx > -1) {
                 coupons[idx].isPinned = !coupons[idx].isPinned;
-                await saveToFirestore();
+                await saveCouponToFirestore(coupons[idx]);
+                renderCoupons(); 
             }
         };
 
@@ -867,7 +916,7 @@
             const customStores = storesInput ? storesInput.split(',').map(s => s.trim()).filter(s => s.length > 0) : null;
 
             const backup = JSON.parse(JSON.stringify(coupons)); 
-
+            
             const couponData = {
                 store: store,
                 title: document.getElementById('addTitle').value || 'הטבה אישית', 
@@ -880,22 +929,35 @@
                 image: currentImageBase64
             };
             
+            let savedItem = null;
+
             if (editId) {
                 const idx = coupons.findIndex(c => c.id == editId);
                 if (idx > -1) {
                     if (!customStores && coupons[idx].stores) couponData.stores = coupons[idx].stores;
                     coupons[idx] = { ...coupons[idx], ...couponData };
+                    savedItem = coupons[idx];
                 }
             } else {
-                coupons.push({ id: Date.now(), isPinned: false, ...couponData });
+                const newId = Date.now();
+                savedItem = { id: newId, isPinned: false, ...couponData };
+                coupons.push(savedItem);
             }
             
-            await saveToFirestore();
+            renderCoupons();
+            updateTotal();
             window.closeModal('addModal');
             
+            if (savedItem) await saveCouponToFirestore(savedItem);
+
             showUndoToast(editId ? "ההטבה עודכנה" : "ההטבה נוספה", async () => {
+                if (!editId) {
+                    await deleteCouponFromFirestore(savedItem.id);
+                } else {
+                    const originalItem = backup.find(c => c.id == editId);
+                    if (originalItem) await saveCouponToFirestore(originalItem);
+                }
                 coupons = backup;
-                await saveToFirestore();
                 renderCoupons();
                 updateTotal();
             });
@@ -903,19 +965,20 @@
 
         window.deleteCoupon = async (id) => {
             const backup = JSON.parse(JSON.stringify(coupons));
+            const deletedItem = coupons.find(c => c.id == id);
             
-            coupons = coupons.filter(c => c.id !== id);
+            coupons = coupons.filter(c => c.id != id);
             renderCoupons(); 
             updateTotal();
             
+            await deleteCouponFromFirestore(id);
+            
             showUndoToast("ההטבה נמחקה", async () => {
                 coupons = backup;
-                await saveToFirestore();
+                if(deletedItem) await saveCouponToFirestore(deletedItem);
                 renderCoupons();
                 updateTotal();
             });
-            
-            await saveToFirestore();
         };
 
         window.copyCode = (code) => {
@@ -939,7 +1002,7 @@
         };
 
         function updateStoreModalUI() {
-            const coupon = coupons.find(c => c.id === currentStoreEditId);
+            const coupon = coupons.find(c => c.id == currentStoreEditId);
             if (!coupon) return;
 
             document.getElementById('storeModalTitle').innerText = coupon.store;
@@ -981,30 +1044,30 @@
             const val = input.value.trim();
             if (!val) return;
             
-            const couponIdx = coupons.findIndex(c => c.id === currentStoreEditId);
+            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
             if (couponIdx > -1) {
                 if (!coupons[couponIdx].stores) coupons[couponIdx].stores = [coupons[couponIdx].store];
-                coupons[couponIdx].stores.unshift(val); // Add to top
-                await saveToFirestore();
+                coupons[couponIdx].stores.unshift(val); 
+                await saveCouponToFirestore(coupons[couponIdx]);
                 input.value = '';
                 updateStoreModalUI();
             }
         };
 
         window.removeStore = async (storeIdx) => {
-            const couponIdx = coupons.findIndex(c => c.id === currentStoreEditId);
+            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
             if (couponIdx > -1 && coupons[couponIdx].stores) {
                 coupons[couponIdx].stores.splice(storeIdx, 1);
-                await saveToFirestore();
+                await saveCouponToFirestore(coupons[couponIdx]);
                 updateStoreModalUI();
             }
         };
 
         window.updateStoreName = async (storeIdx, newVal) => {
-            const couponIdx = coupons.findIndex(c => c.id === currentStoreEditId);
+            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
             if (couponIdx > -1 && coupons[couponIdx].stores) {
                 coupons[couponIdx].stores[storeIdx] = newVal;
-                await saveToFirestore();
+                await saveCouponToFirestore(coupons[couponIdx]);
             }
         };
 
@@ -1083,7 +1146,7 @@
 
                 if (c.isPinned) {
                     pinnedClass = 'pinned-card';
-                    borderClass = ''; // pinned-card handles border
+                    borderClass = ''; 
                 } else {
                     borderClass = 'border-r-4 ' + borderClass;
                 }
