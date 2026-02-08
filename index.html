@@ -262,17 +262,15 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // === Qpon-M Config ===
-        // אם זה עדיין לא עובד עם הקונפיגורציה הזו, הבעיה היא ב-Settings ב-Firebase Console
-        // הוסף את qpon-m.github.io ב-Authorized Domains
+        // === המפתח הנכון (LinkManager) התואם את הדומיין שלך ===
         const firebaseConfig = {
-            apiKey: "AIzaSyBo8rX2FMj-nu4AuY6Kn04RywjWvQlRI7A",
-            authDomain: "mhkmp-d6d0a.firebaseapp.com",
-            projectId: "mhkmp-d6d0a",
-            storageBucket: "mhkmp-d6d0a.firebasestorage.app",
-            messagingSenderId: "17729502517",
-            appId: "1:17729502517:web:5b3bb42670b9710c26e07c",
-            measurementId: "G-M785YSBP4V"
+            apiKey: "AIzaSyBnRk-Os6EvJcFIdpl-lICc9w-E4pQ74nE",
+            authDomain: "linkmanager-fdac5.firebaseapp.com",
+            projectId: "linkmanager-fdac5",
+            storageBucket: "linkmanager-fdac5.firebasestorage.app",
+            messagingSenderId: "532683691813",
+            appId: "1:532683691813:web:5cf639e32a715c626eeccc",
+            measurementId: "G-NVN4E8TDGE"
         };
 
         let app, auth, db, user;
@@ -306,14 +304,13 @@
                     if (user.photoURL) userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
                     if (user.email) userEmail.innerText = user.email;
                     
-                    // Realtime listener like LinkMaster
+                    // חיבור בזמן אמת לפרויקט LinkManager (שם שמרת את הדומיין)
                     onSnapshot(doc(db, "wallets", user.uid), (docSnap) => {
                         if (docSnap.exists()) {
                             coupons = docSnap.data().coupons || [];
                             renderCoupons();
                             updateTotal();
                         } else {
-                            // New user setup
                             coupons = [];
                             saveToFirestore();
                         }
@@ -339,8 +336,6 @@
             }
         }
 
-        // --- Logic (Merged) ---
-        
         window.handleGoogleLogin = async () => {
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
@@ -357,9 +352,6 @@
             }
         };
 
-        // ... שאר הפונקציות (processImageWithAI, CRUD) נשארות זהות אך הותאמו למשתנה coupons ...
-        
-        // --- Image Processing ---
         window.processImageWithAI = async (input) => {
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
@@ -424,7 +416,6 @@
 
         window.removeImage = () => { currentImageBase64 = null; document.getElementById('imagePreview').innerHTML = ''; document.getElementById('imagePreviewContainer').classList.add('hidden'); document.getElementById('imageInput').value = ''; }
 
-        // --- Auth UI Handlers ---
         document.getElementById('logoutBtn').addEventListener('click', async () => { document.getElementById('dataMenu').classList.add('hidden'); await signOut(auth); });
         document.getElementById('googleLoginBtn').addEventListener('click', handleGoogleLogin);
         document.getElementById('switchAccountBtn').addEventListener('click', async () => { 
@@ -433,7 +424,6 @@
             handleGoogleLogin(); 
         });
 
-        // --- UI & CRUD ---
         window.toggleDataMenu = () => document.getElementById('dataMenu').classList.toggle('hidden');
         window.toggleTheme = () => {};
         window.showToast = (text) => { const t = document.getElementById('toast'); document.getElementById('toastText').innerText = text; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); };
@@ -497,7 +487,6 @@
         window.toggleMenu = (id) => { document.querySelectorAll('[id^="menu-"]').forEach(el => { if(el.id !== `menu-${id}`) el.classList.add('hidden'); }); document.getElementById(`menu-${id}`)?.classList.toggle('hidden'); };
         window.togglePin = async (id) => { const idx = coupons.findIndex(c => c.id === id); if(idx>-1) { coupons[idx].isPinned = !coupons[idx].isPinned; await saveToFirestore(); } };
 
-        // --- Store Modal ---
         window.openStoresModal = (id) => { currentStoreEditId = id; isStoreEditMode = false; updateStoreUI(); document.getElementById('storesModal').classList.remove('hidden'); };
         window.toggleStoreEditMode = () => { isStoreEditMode = !isStoreEditMode; updateStoreUI(); };
         function updateStoreUI() {
@@ -520,7 +509,6 @@
         window.updateStoreName = async (si,v) => { const i = coupons.findIndex(c => c.id === currentStoreEditId); if(i>-1) { coupons[i].stores[si]=v; await saveToFirestore(); } };
         window.filterStoreList = () => { const q = document.getElementById('modalSearch').value.toLowerCase(); document.querySelectorAll('.store-item').forEach(el => el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none'); };
         
-        // --- Render ---
         function renderCoupons() {
             const container = document.getElementById('couponsContainer'); container.innerHTML = '';
             let filtered = coupons.filter(c => currentCategory === 'all' || c.category === currentCategory);
@@ -561,7 +549,6 @@
         function updateTotal() { document.getElementById('totalValueDisplay').innerText = `₪${coupons.reduce((a,c)=>a+(c.value||0),0).toLocaleString()}`; }
         window.checkInterception = (q) => { if(q.length<2) { document.getElementById('interceptionResult').innerHTML = ''; return; } const matches = coupons.filter(c => c.stores?.some(s => s.toLowerCase().includes(q.toLowerCase()))); document.getElementById('interceptionResult').innerHTML = matches.length ? matches.map(c => `<div class="bg-[#0f172a] p-4 rounded-xl border-r-4 border-green-500 mb-2 shadow-sm flex justify-between items-center"><span class="font-bold text-white">${c.store}</span><span class="font-bold text-brand">₪${c.value}</span></div>`).join('') : '<div class="text-center py-8 text-gray-500"><p>לא נמצאה הטבה</p></div>'; };
 
-        // --- Undo / Download ---
         window.showUndoToast = (msg, cb) => { const t = document.getElementById('undoToast'); document.getElementById('toastMessage').innerText = msg; undoCallback = cb; t.classList.remove('translate-y-20', 'opacity-0'); document.getElementById('toastProgress').style.width = '100%'; setTimeout(() => { document.getElementById('toastProgress').style.width = '0%'; document.getElementById('toastProgress').style.transition = 'width 5s linear'; }, 100); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 5000); };
         window.triggerUndo = () => { if(undoCallback) undoCallback(); document.getElementById('undoToast').classList.add('translate-y-20', 'opacity-0'); };
         window.downloadData = () => { const node = document.createElement('a'); node.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(coupons)); node.download = "qpon_backup.json"; node.click(); }; 
