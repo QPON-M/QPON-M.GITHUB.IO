@@ -435,6 +435,27 @@
             db = getFirestore(app);
         } catch (e) { console.error("Firebase Init Error:", e); }
 
+        // --- Constants from SmartSave (Required for proper data structure) ---
+        const STORES_CARREFOUR = ['קרפור', 'Carrefour', 'Hyper', 'City', 'Market', 'יינות ביתן', 'מגה בעיר', 'שוק מהדרין', 'ביתן מרקט'];
+        const STORES_MAX = ['Fox', 'פוקס', 'Fox Home', 'American Eagle', 'Mango', 'Laline', 'Billabong', "Sack's", 'Terminal X', "The Children's Place", 'Foot Locker', 'Flying Tiger', 'Shilav', 'Golf', 'Golf & Co', 'Intima', 'Polgat', 'Kitan', 'Adika', 'Castro', 'Hoodies', 'Top Ten', 'Urbanica', 'Kiko Milano', 'Yves Rocher', 'Steimatzky', 'KSP', 'Ace', 'Auto Depot', 'Hamashbir', 'Mega Sport', 'Opticana', 'Aldo', 'Gali', 'Timberland', 'Lee Cooper', 'Nine West', 'Vardinon', 'Naaman'];
+        const STORES_ICARD = ['Victory', 'ויקטורי', 'Nizat Haduvdevan', 'ניצת הדובדבן', 'King Store', 'קינג סטור', "Shuk Ha'ir", 'שוק העיר', 'Machsanei HaShuk', 'מחסני השוק', 'Fox', 'פוקס', 'Fox Home', 'פוקס הום', 'American Eagle', 'Mango', 'Laline', 'Billabong', 'Golf', 'גולף', 'Golf & Co', 'Vardinon', 'ורדינון', 'Naaman', 'נעמן', 'Intima', 'Kitan', 'Adidas', 'אדידס', 'Nike', 'נייקי', 'Foot Locker', 'פוט לוקר', 'Mega Sport', 'מגה ספורט', 'H&O', 'Delta', 'דלתא', 'Gali', 'גלי', 'Lee Cooper', 'לי קופר', 'Timberland', 'Castro', 'קסטרו', 'Hoodies', 'Top Ten', 'Renuar', 'רנואר', 'TwentyFourSeven', 'Steimatzky', 'סטימצקי', 'Tzomet Sfarim', 'צומת ספרים', 'Shekem Electric', 'שקם אלקטריק', 'Home Center', 'הום סנטר', 'ACE', 'אייס', 'Cinema City', 'סינמה סיטי', 'iJump', 'Holmes Place'];
+        const STORES_SHUFERSAL = ['שופרסל', 'Shufersal', 'שופרסל דיל', 'שופרסל שלי', 'שופרסל אקספרס', 'Be', 'Be Pharm', 'שופרסל אונליין'];
+        const STORES_CORP = ['Zara', 'זארה', 'Pull and Bear', 'Massimo Dutti', 'Bershka', 'Stradivarius', 'Zara Home', 'Shufersal', 'Be', 'Victory', 'Mega', 'Yeinot Bitan', 'Machsanei HaShuk', 'Tiv Taam', 'Hatzi Hinam', 'Rami Levy', 'Yochananof', 'Stop Market', 'Freshmarket', 'Super Yuda', 'Co-Op', 'AM:PM', 'Fox', 'Fox Home', 'American Eagle', 'Mango', 'Laline', 'Terminal X', 'Golf', 'Golf & Co', 'Castro', 'Hoodies', 'Top Ten', 'Renuar', 'H&O', 'Delta', 'Hamashbir', 'Timberland', 'Lee Cooper', 'Gali', 'Nine West', 'Aldo', 'KSP', 'Ivory', 'Shekem Electric', 'Mahsanei Hashmal', 'ACE', 'Home Center', 'Auto Depot', 'Steimatzky', 'Tzomet Sfarim', 'Mega Sport', 'Toys R Us', 'Shilav', 'Super-Pharm', 'April', 'Sabon'];
+        const STORES_IAI = ['H&O', 'Hamashbir', 'Golf', 'Kitan', 'Steimatzky', 'KSP', 'Home Center', 'Ace', 'Mega', 'Shufersal'];
+        const STORES_TAV_ZAHAV = ['שופרסל', 'Be', 'Golf', 'Intima', 'Polgat', 'Kitan', 'Hamashbir', 'H&O', 'Steimatzky', 'Tzomet Sfarim', 'Gali', 'Teva Naot', 'Opticana', 'Lee Cooper'];
+        const STORES_RENUAR = ['Renuar', 'רנואר', 'TwentyFourSeven', 'טוונטי פור סבן'];
+
+        const defaultCoupons = [
+            { id: 2, title: 'הטבה אישית', store: 'Carrefour קרפור', value: 200, textValue: '', exp: '2028-10-25', code: '799044022633', category: 'food', stores: STORES_CARREFOUR, isPinned: false },
+            { id: 3, title: 'MAX Gift Card', store: 'MAX מקס', value: 100, exp: '2029-03-31', category: 'fashion', stores: STORES_MAX, isPinned: false },
+            { id: 4, title: 'iCard נופשונית', store: 'iCard', value: 100, exp: '2029-03-27', category: 'home', stores: STORES_ICARD, link: 'https://slink.k4a.co.il/Registeration/MDiEKAwuMl', isPinned: false },
+            { id: 5, title: 'שופרסל Gift Card', store: 'שופרסל', value: 550, exp: '2029-05-30', category: 'food', stores: STORES_SHUFERSAL, isPinned: false },
+            { id: 6, title: 'Isracard Corporate', store: 'ישראכרט נטען', value: 500, exp: '2029-09-29', category: 'food', stores: STORES_CORP, link: 'https://slink.k4a.co.il/fd7cBeQAX4', isPinned: false },
+            { id: 7, title: 'שובר תע"א (פסח)', store: 'תעשייה אווירית', value: 625, exp: '2030-02-26', code: '116613138-7501', category: 'home', stores: STORES_IAI, link: 'https://bc.mltp.co.il/?i=1166131387501', isPinned: false },
+            { id: 8, title: 'תו זהב סלולרי', store: 'תו זהב', value: 200, exp: '2030-06-30', category: 'fashion', stores: STORES_TAV_ZAHAV, link: 'http://bl2.co/XJjy5afAEYX', isPinned: false },
+            { id: 9, title: 'הטבה אישית', store: 'רנואר', value: 50, exp: '2099-12-31', category: 'fashion', stores: STORES_RENUAR, isPinned: false }
+        ];
+
         let coupons = []; 
         let currentCategory = 'all';
         let currentImageBase64 = null;
@@ -478,7 +499,10 @@
                 if (docSnap.exists()) {
                     coupons = docSnap.data().coupons || [];
                 } else {
-                    coupons = [];
+                    // Logic from SmartSave: Load default coupons for specific user
+                    if (user.email === 'meirhadad74@gmail.com') coupons = defaultCoupons;
+                    else coupons = [];
+                    await saveToFirestore();
                 }
                 renderCoupons();
                 updateTotal();
@@ -509,11 +533,10 @@
             });
         }
 
-        // --- AUTH LOGIC (Updated) ---
+        // --- AUTH LOGIC (Standard from SmartSave) ---
         window.handleGoogleLogin = async () => {
-            const provider = new GoogleAuthProvider();
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { document.getElementById('authError').innerText = "שגיאת התחברות: " + e.message; document.getElementById('authError').classList.remove('hidden'); }
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { document.getElementById('authError').innerText = e.message; document.getElementById('authError').classList.remove('hidden'); }
         };
 
         window.handleLogout = async () => {
