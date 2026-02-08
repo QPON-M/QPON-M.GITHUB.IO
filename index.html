@@ -166,7 +166,7 @@
         <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-gray-200 dark:border-gray-800">
             <div class="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg app-icon bg-white dark:bg-gray-800">
                 <img src="icon.jpg" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/60/60484.png'" 
+                     onerror="this.src='icon_gray.jpg'" 
                      class="w-full h-full object-cover" 
                      alt="App Icon">
             </div>
@@ -185,7 +185,7 @@
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <img src="icon.jpg" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/60/60484.png'" 
+                     onerror="this.src='icon_gray.jpg'" 
                      class="w-full h-full object-cover" 
                      alt="Logo">
             </div>
@@ -423,7 +423,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // הגדרות Firebase החדשות שלך
+        // הגדרות Firebase החדשות
         const firebaseConfig = {
             apiKey: "AIzaSyBnRk-Os6EvJcFIdpl-lICc9w-E4pQ74nE",
             authDomain: "linkmanager-fdac5.firebaseapp.com",
@@ -521,6 +521,7 @@
             });
         }
 
+        // --- התחברות לגוגל ---
         window.handleGoogleLogin = async () => {
             try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
             catch (e) { document.getElementById('authError').innerText = e.message; document.getElementById('authError').classList.remove('hidden'); }
@@ -531,10 +532,11 @@
             toggleUserMenu(); 
         };
 
+        // --- החלפת משתמש עם מסך בחירת חשבון ---
         window.handleSwitchAccount = async () => {
-            await signOut(auth);
+            await signOut(auth); // קודם מנתקים
             const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
+            provider.setCustomParameters({ prompt: 'select_account' }); // מאלץ מסך בחירה
             try {
                 await signInWithPopup(auth, provider);
             } catch (e) { console.error(e); }
@@ -659,7 +661,6 @@
             `).join('\n').trim();
         }
 
-        // --- Parsing Logic taken EXACTLY from uploaded file ---
         function parseCustomText(text) {
             const items = [];
             const blocks = text.split('----------------------------------------');
@@ -691,7 +692,6 @@
             });
             return items;
         }
-        // ---------------------------------------------------
 
         window.downloadData = () => {
             const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(generateCustomText(coupons));
@@ -709,7 +709,6 @@
             document.getElementById('dataMenu').classList.add('hidden');
         };
 
-        // --- Import Logic taken EXACTLY from uploaded file ---
         window.handleFileImport = (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -774,7 +773,6 @@
             };
             reader.readAsText(file);
         };
-        // ---------------------------------------------------
 
         window.togglePin = async (id) => {
             const idx = coupons.findIndex(c => c.id === id);
