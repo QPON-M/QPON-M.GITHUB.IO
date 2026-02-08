@@ -205,6 +205,13 @@
             </button>
             
             <div id="dataMenu" class="hidden absolute top-12 left-0 bg-white dark:bg-[#1e293b] shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden w-48 z-50">
+                <button onclick="loadHardcodedBackup()" class="w-full text-right px-4 py-3 text-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400"><i class="fas fa-magic"></i></div>
+                    <div>
+                        <span class="font-bold block">שחזר נתונים מהשיחה</span>
+                        <span class="text-[10px] opacity-60">טעינה אוטומטית</span>
+                    </div>
+                </button>
                 <button onclick="downloadData()" class="w-full text-right px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
                     <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400"><i class="fas fa-file-alt"></i></div>
                     <div>
@@ -440,8 +447,44 @@
             db = getFirestore(app);
         } catch (e) { console.error("Firebase Init Error:", e); }
 
-        const defaultCoupons = [
-            { id: 2, title: 'הטבה אישית', store: 'Carrefour קרפור', value: 200, textValue: '', exp: '2028-10-25', code: '799044022633', category: 'food', stores: ['קרפור'], isPinned: false }
+        // --- גיבוי מוטמע לשימוש חירום (מונע תקלות קבצים) ---
+        const emergencyBackup = [
+          {
+            "store": "Carrefour קרפור", "title": "הטבה אישית", "value": 0, "exp": "2028-10-25", "code": "799044022633", "category": "food", "isPinned": false,
+            "stores": ["Carrefour", "Hyper", "City", "Market", "יינות ביתן", "מגה בעיר", "שוק מהדרין", "ביתן מרקט", "קרפור"]
+          },
+          {
+            "store": "MAX מקס", "title": "MAX Gift Card", "value": 100, "exp": "2029-03-31", "category": "fashion", "isPinned": false,
+            "stores": ["Golf - גולף", "Intima - אינטימה", "Polgat - פולגת", "Fox - פוקס", "Aerie - ארי", "American Eagle - אמריקן איגל", "Mango - מנגו", "Daphna Levinson - דפנה לוינסון", "H&O - אייץ' אנד או", "Lee Cooper - לי קופר", "Nautica - נאוטיקה", "Levi's - ליוויס", "BOSS - בוס", "Tommy Hilfiger - טומי הילפיגר", "Fred Perry - פרד פרי", "Paul & Shark - פול אנד שארק", "Juicy Couture - ג'וסי קוטור", "Calvin Klein Jeans - קלווין קליין", "Armani Exchange - ארמני אקסצ'יינג'", "Terminal X - טרמינל איקס", "Desigual - דסיגואל", "Longchamp - לונגצ'אמפ", "Superdry - סופרדריי", "Diesel - דיזל", "Lacoste - לקוסט", "Bonita de Mas - בוניטה דה מאס", "Afrodita - אפרודיטה", "Yanga - יאנגה", "DKNY - דונה קארן", "Guess - גאס", "Gant - גנט", "Sam Edelman - סם אדלמן", "Femina - פמינה", "Replay - ריפליי", "Timberland - טימברלנד", "Emporium - אמפוריום", "Ruby Bay - רובי ביי", "Adika - עדיקה", "Speedo - ספידו", "Ellesse - אלס", "Vilebrequin - וילברקווין", "Bogart - בוגרט", "Merkaz Halvasha - מרכז הלבשה", "Jump & Onot - ג'אמפ ועונות", "Shilav - שילב", "Golf & Kids - גולף קידס", "The Children's Place - דה צ'ילדרנס פלייס", "Solog - סולוג", "Habursa Latahshitim - הבורסה לתכשיטים", "Minene - מיננה", "Petit Bateau - פטיט בטאו", "Mega Sport Kids - מגה ספורט קידס", "Tous - טוס", "Michael Kors - מייקל קורס", "Laster - לאסטר", "Sunglass Hut - סאנגלס האט", "Agalim - עגליס", "Motzetzim - מוצצים", "Kitan - כיתן", "Golf & Co - גולף אנד קו", "Fox Home - פוקס הום", "Mashbir - המשביר", "American Comfort - אמריקן קומפורט", "Laline - ללין", "Steimatzky - סטימצקי", "Aminach - עמינח", "Good Night - גוד נייט", "Home Center - הום סנטר", "Vardinon - ורדינון", "Naaman - נעמן", "Darlain - דרלן", "Home Style - הום סטייל", "ACE - אייס", "Auto Depot - אוטו דיפו", "Sabon - סבון", "A.L.M - א.ל.מ", "Flying Tiger Copenhagen - פליינג טייגר", "Food Appeal - פוד אפיל", "Atzmaleh - עצמל'ה", "Lavan - לבן", "Deal Tavora - דיל תאורה", "Shekem Electric - שקם אלקטריק", "Yooz - יודז", "Bumpers - במפרס", "A-Club - איי קלאב", "Pulliez - פוליז", "Havaianas - הוויאנס", "Cafeneto - קפה נטו", "4Chef - פור שף", "Queen of Sheba - מלכת שבא", "Astral Hotels - מלונות אסטרל", "Daka 90 - הדקה ה-90", "Artikim - ארטיקים", "Blik - בליק", "iJump - איי ג'אמפ", "Jump Up - ג'אמפ אפ", "Jacob Hotels - מלונות ג'ייקוב", "Dan Lounge - טרקלין דן", "Flow - פלואו", "Waterland - ווטרלנד", "Foot Locker - פוט לוקר", "Reebok - ריבוק", "Billabong - בילבונג", "Gali - גלי", "Mega Sport - מגה ספורט", "Nine West - ניין ווסט", "Steve Madden - סטיב מאדן", "Asics - אסיקס", "Originals - אוריג'ינלס", "Birkenstock - בירקנשטוק", "Boardriders - בורדריידרס", "Roxy - רוקסי", "Quiksilver - קוויקסילבר", "Raven - רייבן", "Puma - פומה", "Inter Jeans / Nyou - אינטר ג'ינס", "Lady Comfort - ליידי קומפורט", "Saucony - סאקוני", "Skechers - סקצ'רס", "Rosen & Meents - רוזן ומינץ", "Converse - קונברס", "Brownie - בראוני", "Aldo - אלדו"]
+          },
+          {
+            "store": "iCard", "title": "iCard נופשונית", "value": 100, "exp": "2029-03-27", "category": "home", "link": "https://slink.k4a.co.il/Registeration/MDiEKAwuMl", "isPinned": false,
+            "stores": ["Hamashbir Lazarchan - המשביר לצרכן", "Fox - פוקס", "Fox Home - פוקס הום", "Castro - קסטרו", "Castro Home - קסטרו הום", "Golf - גולף", "Golf & Co - גולף אנד קו", "H&O - אייץ' אנד או", "Home Center - הום סנטר", "ACE - אייס", "Renuar - רנואר", "Twenty Four Seven - טוונטי פור סבן", "Hoodies - הודיס", "Urbanica - אורבניקה", "Terminal X - טרמינל איקס", "American Eagle - אמריקן איגל", "Mango - מנגו", "Zara - זארה", "Pull & Bear - פול אנד בר", "Bershka - ברשקה", "Stradivarius - סטרדיווריוס", "Massimo Dutti - מאסימו דוטי", "Nike - נייקי", "Adidas - אדידס", "Foot Locker - פוט לוקר", "Mega Sport - מגה ספורט", "Weshoes - ווישוז", "Aldo - אלדו", "Call It Spring - קול איט ספרינג", "Nimrod - נימרוד", "Teva Naot - טבע נאות", "Delta - דלתא", "Fix - פיקס", "Intima - אינטימה", "Polgat - פולגת", "Kitan - כיתן", "Vardinon - ורדינון", "Naaman - נעמן", "Steimatzky - סטימצקי", "Tzomet Sfarim - צומת ספרים", "Laline - ללין", "Sabon - סבון", "April - אפריל", "Yves Rocher - איב רושה", "Estee Lauder - אסתי לאודר", "MAC - מאק", "Bobbi Brown - בובי בראון", "Toys R Us - טויז אר אס", "Shilav - שילב", "Carter's - קרטרס", "The Children's Place - דה צ'ילדרנס פלייס", "Minene - מיננה", "Keds - קדס", "Opticana - אופטיקנה", "Erroca - אירוקה", "Carolina Lemke - קרולינה למקה", "Top Ten - טופ טן", "Gentleman - ג'נטלמן", "Ricochet - ריקושט", "Shekem Electric - שקם אלקטריק", "Mahsanei Hashmal - מחסני חשמל", "A.L.M - א.ל.מ", "Best Mobile - בסט מובייל", "Dynamica - דינמיקה", "Bug - באג", "iDigital - איידיגיטל", "Kravitz - קרביץ", "Billabong - בילבונג", "Sack's - סאקס", "Jack Kuba - ג'ק קובה", "Femina - פמינה", "Bonita De Mas - בוניטה דה מאס", "Afrodita - אפרודיטה", "Crazy Line - קרייזי ליין", "Golbary - גולברי", "Lee Cooper - לי קופר", "Gali - גלי", "Nine West - ניין ווסט", "Timberland - טימברלנד", "Nautica - נאוטיקה", "Emporium - אמפוריום", "Solog - סולוג"]
+          },
+          {
+            "store": "תו הזהב שופרסל", "title": "שופרסל Gift Card", "value": 550, "exp": "2029-05-30", "category": "food", "isPinned": false,
+            "stores": ["Shufersal - שופרסל", "Be - בי פארם", "Yesh - יש", "Organic Market - אורגניק מרקט", "Good Market - גוד מרקט", "Hamashbir Lazarchan - המשביר לצרכן", "H&O - אייץ' אנד או", "H&M - אייץ' אנד אם", "Home Center - הום סנטר", "ACE - אייס", "Golf - גולף", "Golf & Co - גולף אנד קו", "Golf Kids - גולף קידס", "Fox - פוקס", "Fox Home - פוקס הום", "Castro - קסטרו", "Castro Home - קסטרו הום", "Renuar - רנואר", "Terminal X - טרמינל איקס", "Delta - דלתא", "Hoodies - הודיס", "Twenty Four Seven - טוונטי פור סבן", "Adidas - אדידס", "Foot Locker - פוט לוקר", "Mega Sport - מגה ספורט", "Aluf Sport - אלוף ספורט", "Shekem Electric - שקם אלקטריק", "Auto Depot - אוטו דיפו", "Vardinon - ורדינון", "Naaman - נעמן", "Kitan - כיתן", "Steimatzky - סטימצקי", "Tzomet Sfarim - צומת ספרים", "Toys R Us - טויז אר אס", "Shilav - שילב", "Motzetzim - מוצצים", "Minene - מיננה", "Carter's - קרטרס", "The Children's Place - דה צ'ילדרנס פלייס", "Flying Tiger - פליינג טייגר", "Sabon - סבון", "Laline - ללין", "Body Shop - בודי שופ", "April - אפריל", "Yves Rocher - איב רושה", "Gali - גלי", "Nimrod - נימרוד", "Teva Naot - טבע נאות", "Skechers - סקצ'רס", "Asics - אסיקס", "Saucony - סאקוני", "Converse - קונברס", "Vans - ואנס", "Timberland - טימברלנד", "Nine West - ניין ווסט", "Aldo - אלדו", "Steve Madden - סטיב מאדן", "Golbary - גולברי", "Crazy Line - קרייזי ליין", "Jump & Onot - ג'אמפ ועונות", "Desigual - דסיגואל", "Intima - אינטימה", "Aphrodite - אפרודיטה", "Bonita De Mas - בוניטה דה מאס", "Jack Kuba - ג'ק קובה", "Femina - פמינה", "American Eagle - אמריקן איגל", "Billabong - בילבונג", "Nautica - נאוטיקה", "Tommy Hilfiger - טומי הילפיגר", "Levi's - ליוויס", "Lee Cooper - לי קופר", "Diesel - דיזל", "Hugo - הוגו", "Calvin Klein - קלווין קליין", "Michael Kors - מייקל קורס", "Armani Exchange - ארמני אקסצ'יינג'", "Factory 54 - פקטורי 54", "Betili - ביתילי", "IDdesign - אי די דיזיין", "Urban - אורבן", "Soltam - סולתם", "Food Appeal - פוד אפיל", "Ricochet - ריקושט", "Yanga - יאנגה", "Opticana - אופטיקנה", "Mango - מנגו", "Superdry - סופרדריי", "Tous - טוס", "Sam Edelman - סם אדלמן", "Emporium - אמפוריום", "Longchamp - לונגצ'אמפ", "Petit Bateau - פטיט בטאו", "Lacoste - לקוסט", "Emporio Armani - אמפוריו ארמני", "Paul & Shark - פול אנד שארק", "Guess - גאס", "Brownie - בראוני", "Originals - אוריגינלס", "Vilebrequin - וילברקווין", "Amor - אמור", "Dynamica - דינמיקה", "Worker - וורקר", "Ruby Bay - רובי ביי", "New Era - ניו ארה", "Lee - לי", "Polo Ralph Lauren - פולו ראלף לורן", "Show Off - שואו אוף", "Tik Tikim - תיק תיקים", "Bigod - ביגוד", "Nyou - ניו יו", "DKNY - די קיי אן ויי", "Ice Cube - אייס קיוב"]
+          },
+          {
+            "store": "Isracard Corporate", "title": "Isracard Corporate", "value": 500, "exp": "2029-09-29", "category": "gifts", "link": "https://slink.k4a.co.il/fd7cBeQAX4", "isPinned": false,
+            "stores": ["Zara", "זארה", "Pull and Bear", "פול אנד בר", "Massimo Dutti", "Bershka", "ברשקה", "Stradivarius", "Zara Home", "Shufersal", "שופרסל", "Be", "Victory", "ויקטורי", "Mega", "מגה", "Mega Ba'Ir", "Yeinot Bitan", "יינות ביתן", "Machsanei HaShuk", "מחסני השוק", "Tiv Taam", "טיב טעם", "Hatzi Hinam", "חצי חינם", "Rami Levy", "רמי לוי", "Yochananof", "יוחננוף", "Stop Market", "סטופ מרקט", "Freshmarket", "פרשמרקט", "Super Yuda", "סופר יודה", "Co-Op", "קואופ", "Salach Dabach", "סאלח דבאח", "AM:PM", "Nativ Hachesed", "נתיב החסד", "Fox", "פוקס", "Fox Home", "American Eagle", "Mango", "Laline", "Terminal X", "Golf", "Golf & Co", "Intima", "Kitan", "Polgat", "Castro", "Hoodies", "Top Ten", "Urbanica", "Renuar", "רנואר", "TwentyFourSeven", "H&O", "Delta", "Jack Kuba", "Hamashbir", "Timberland", "Nautica", "Lee Cooper", "Gali", "Nine West", "Steve Madden", "Aldo", "KSP", "Ivory", "אייבורי", "Shekem Electric", "שקם אלקטריק", "Mahsanei Hashmal", "מחסני חשמל", "ACE", "אייס", "Home Center", "הום סנטר", "Auto Depot", "אוטו דיפו", "Steimatzky", "סטימצקי", "Tzomet Sfarim", "צומת ספרים", "Mega Sport", "Toys R Us", "Shilav", "Super-Pharm", "April", "Sabon"]
+          },
+          {
+            "store": "תעשייה אווירית", "title": "שובר תע\"א (פסח)", "value": 625, "exp": "2030-02-26", "code": "116613138-7501", "category": "home", "link": "https://bc.mltp.co.il/?i=1166131387501", "isPinned": false,
+            "stores": ["H&O", "Hamashbir", "המשביר לצרכן", "Golf", "גולף", "Kitan", "כיתן", "Steimatzky", "סטימצקי", "KSP", "Home Center", "הום סנטר", "Ace", "אייס", "Mega", "מגה", "Shufersal", "שופרסל"]
+          },
+          {
+            "store": "תו זהב", "title": "תו זהב סלולרי", "value": 200, "exp": "2030-06-30", "category": "fashion", "link": "http://bl2.co/XJjy5afAEYX", "isPinned": false,
+            "stores": ["Shufersal - שופרסל", "Be - בי פארם", "Yesh - יש", "Organic Market - אורגניק מרקט", "Good Market - גוד מרקט", "Hamashbir Lazarchan - המשביר לצרכן", "H&O - אייץ' אנד או", "H&M - אייץ' אנד אם", "Home Center - הום סנטר", "ACE - אייס", "Golf - גולף", "Golf & Co - גולף אנד קו", "Golf Kids - גולף קידס", "Fox - פוקס", "Fox Home - פוקס הום", "Castro - קסטרו", "Castro Home - קסטרו הום", "Renuar - רנואר", "Terminal X - טרמינל איקס", "Delta - דלתא", "Hoodies - הודיס", "Twenty Four Seven - טוונטי פור סבן", "Adidas - אדידס", "Foot Locker - פוט לוקר", "Mega Sport - מגה ספורט", "Aluf Sport - אלוף ספורט", "Shekem Electric - שקם אלקטריק", "Auto Depot - אוטו דיפו", "Vardinon - ורדינון", "Naaman - נעמן", "Kitan - כיתן", "Steimatzky - סטימצקי", "Tzomet Sfarim - צומת ספרים", "Toys R Us - טויז אר אס", "Shilav - שילב", "Motzetzim - מוצצים", "Minene - מיננה", "Carter's - קרטרס", "The Children's Place - דה צ'ילדרנס פלייס", "Flying Tiger - פליינג טייגר", "Sabon - סבון", "Laline - ללין", "Body Shop - בודי שופ", "April - אפריל", "Yves Rocher - איב רושה", "Gali - גלי", "Nimrod - נימרוד", "Teva Naot - טבע נאות", "Skechers - סקצ'רס", "Asics - אסיקס", "Saucony - סאקוני", "Converse - קונברס", "Vans - ואנס", "Timberland - טימברלנד", "Nine West - ניין ווסט", "Aldo - אלדו", "Steve Madden - סטיב מאדן", "Golbary - גולברי", "Crazy Line - קרייזי ליין", "Jump & Onot - ג'אמפ ועונות", "Desigual - דסיגואל", "Intima - אינטימה", "Aphrodite - אפרודיטה", "Bonita De Mas - בוניטה דה מאס", "Jack Kuba - ג'ק קובה", "Femina - פמינה", "American Eagle - אמריקן איגל", "Billabong - בילבונג", "Nautica - נאוטיקה", "Tommy Hilfiger - טומי הילפיגר", "Levi's - ליוויס", "Lee Cooper - לי קופר", "Diesel - דיזל", "Hugo - הוגו", "Calvin Klein - קלווין קליין", "Michael Kors - מייקל קורס", "Armani Exchange - ארמני אקסצ'יינג'", "Factory 54 - פקטורי 54", "Betili - ביתילי", "IDdesign - אי די דיזיין", "Urban - אורבן", "Soltam - סולתם", "Food Appeal - פוד אפיל", "Ricochet - ריקושט", "Yanga - יאנגה", "Opticana - אופטיקנה", "Mango - מנגו", "Superdry - סופרדריי", "Tous - טוס", "Sam Edelman - סם אדלמן", "Emporium - אמפוריום", "Longchamp - לונגצ'אמפ", "Petit Bateau - פטיט בטאו", "Lacoste - לקוסט", "Emporio Armani - אמפוריו ארמני", "Paul & Shark - פול אנד שארק", "Guess - גאס", "Brownie - בראוני", "Originals - אוריגינלס", "Vilebrequin - וילברקווין", "Amor - אמור", "Dynamica - דינמיקה", "Worker - וורקר", "Ruby Bay - רובי ביי", "New Era - ניו ארה", "Lee - לי", "Polo Ralph Lauren - פולו ראלף לורן", "Show Off - שואו אוף", "Tik Tikim - תיק תיקים", "Bigod - ביגוד", "Nyou - ניו יו", "DKNY - די קיי אן ויי", "Ice Cube - אייס קיוב"]
+          },
+          {
+            "store": "רנואר", "title": "הטבה אישית", "value": 50, "exp": "2444-12-31", "category": "fashion", "isPinned": false,
+            "stores": ["Renuar", "רנואר", "TwentyFourSeven", "טוונטי פור סבן"]
+          },
+          {
+            "store": "תו הזהב שופרסל", "title": "תו הזהב שופרסל", "value": 600, "exp": "2029-05-01", "category": "gifts", "isPinned": false,
+            "stores": ["Shufersal - שופרסל", "Be - בי פארם", "Yesh - יש", "Organic Market - אורגניק מרקט", "Good Market - גוד מרקט", "Hamashbir Lazarchan - המשביר לצרכן", "H&O - אייץ' אנד או", "H&M - אייץ' אנד אם", "Home Center - הום סנטר", "ACE - אייס", "Golf - גולף", "Golf & Co - גולף אנד קו", "Golf Kids - גולף קידס", "Fox - פוקס", "Fox Home - פוקס הום", "Castro - קסטרו", "Castro Home - קסטרו הום", "Renuar - רנואר", "Terminal X - טרמינל איקס", "Delta - דלתא", "Hoodies - הודיס", "Twenty Four Seven - טוונטי פור סבן", "Adidas - אדידס", "Foot Locker - פוט לוקר", "Mega Sport - מגה ספורט", "Aluf Sport - אלוף ספורט", "Shekem Electric - שקם אלקטריק", "Auto Depot - אוטו דיפו", "Vardinon - ורדינון", "Naaman - נעמן", "Kitan - כיתן", "Steimatzky - סטימצקי", "Tzomet Sfarim - צומת ספרים", "Toys R Us - טויז אר אס", "Shilav - שילב", "Motzetzim - מוצצים", "Minene - מיננה", "Carter's - קרטרס", "The Children's Place - דה צ'ילדרנס פלייס", "Flying Tiger - פליינג טייגר", "Sabon - סבון", "Laline - ללין", "Body Shop - בודי שופ", "April - אפריל", "Yves Rocher - איב רושה", "Gali - גלי", "Nimrod - נימרוד", "Teva Naot - טבע נאות", "Skechers - סקצ'רס", "Asics - אסיקס", "Saucony - סאקוני", "Converse - קונברס", "Vans - ואנס", "Timberland - טימברלנד", "Nine West - ניין ווסט", "Aldo - אלדו", "Steve Madden - סטיב מאדן", "Golbary - גולברי", "Crazy Line - קרייזי ליין", "Jump & Onot - ג'אמפ ועונות", "Desigual - דסיגואל", "Intima - אינטימה", "Aphrodite - אפרודיטה", "Bonita De Mas - בוניטה דה מאס", "Jack Kuba - ג'ק קובה", "Femina - פמינה", "American Eagle - אמריקן איגל", "Billabong - בילבונג", "Nautica - נאוטיקה", "Tommy Hilfiger - טומי הילפיגר", "Levi's - ליוויס", "Lee Cooper - לי קופר", "Diesel - דיזל", "Hugo - הוגו", "Calvin Klein - קלווין קליין", "Michael Kors - מייקל קורס", "Armani Exchange - ארמני אקסצ'יינג'", "Factory 54 - פקטורי 54", "Betili - ביתילי", "IDdesign - אי די דיזיין", "Urban - אורבן", "Soltam - סולתם", "Food Appeal - פוד אפיל", "Ricochet - ריקושט", "Yanga - יאנגה", "Opticana - אופטיקנה", "Mango - מנגו", "Superdry - סופרדריי", "Tous - טוס", "Sam Edelman - סם אדלמן", "Emporium - אמפוריום", "Longchamp - לונגצ'אמפ", "Petit Bateau - פטיט בטאו", "Lacoste - לקוסט", "Emporio Armani - אמפוריו ארמני", "Paul & Shark - פול אנד שארק", "Guess - גאס", "Brownie - בראוני", "Originals - אוריגינלס", "Vilebrequin - וילברקווין", "Amor - אמור", "Dynamica - דינמיקה", "Worker - וורקר", "Ruby Bay - רובי ביי", "New Era - ניו ארה", "Lee - לי", "Polo Ralph Lauren - פולו ראלף לורן", "Show Off - שואו אוף", "Tik Tikim - תיק תיקים", "Bigod - ביגוד", "Nyou - ניו יו", "DKNY - די קיי אן ויי", "Ice Cube - אייס קיוב"]
+          }
         ];
 
         let coupons = []; 
@@ -492,7 +535,7 @@
                     querySnapshot.forEach((doc) => {
                         coupons.push({ id: doc.id, ...doc.data() });
                     });
-                    // המרה ל-Number אם ה-ID מספרי (תאימות לאחור)
+                    // המרה ל-Number אם ה-ID מספרי
                     coupons = coupons.map(c => ({...c, id: isNaN(c.id) ? c.id : Number(c.id)}));
                 } else {
                     // מיגרציה מנתונים ישנים
@@ -514,10 +557,8 @@
                         await batch.commit();
                         console.log("מיגרציה הושלמה!");
                     } else {
-                        if (user.email === 'meirhadad74@gmail.com') {
-                            coupons = defaultCoupons;
-                            defaultCoupons.forEach(c => saveCouponToFirestore(c));
-                        }
+                        // אם אין נתונים בכלל, לא טוענים כלום אוטומטית (משאירים למשתמש אופציה לשחזור)
+                        coupons = [];
                     }
                 }
                 
@@ -536,7 +577,6 @@
             try {
                 const couponId = String(coupon.id);
                 await setDoc(doc(db, "wallets", user.uid, "coupons", couponId), coupon);
-                // עדכון timestamp ראשי
                 setDoc(doc(db, "wallets", user.uid), { lastUpdated: new Date() }, { merge: true });
             } catch (e) { console.error("Error saving:", e); }
         }
@@ -693,6 +733,51 @@
             event.stopPropagation();
         };
 
+        // --- פונקציה מיוחדת לשחזור נתונים מוטמעים ---
+        window.loadHardcodedBackup = async () => {
+            if (!confirm("פעולה זו תוסיף את כל הנתונים מהגיבוי האחרון לארנק שלך. האם להמשיך?")) return;
+            
+            const backup = JSON.parse(JSON.stringify(coupons));
+            let addedCount = 0;
+            let skippedCount = 0;
+            const itemsToAdd = [];
+
+            emergencyBackup.forEach(newItem => {
+                 const exists = coupons.some(existing => 
+                    existing.store === newItem.store &&
+                    existing.value === newItem.value &&
+                    (existing.code === newItem.code || (!existing.code && !newItem.code))
+                );
+                
+                if (exists) {
+                    skippedCount++;
+                } else {
+                    const itemToAdd = { ...newItem, id: Date.now() + Math.random() };
+                    itemsToAdd.push(itemToAdd);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                coupons = [...coupons, ...itemsToAdd];
+                await saveImportedCoupons(itemsToAdd);
+                renderCoupons();
+                updateTotal();
+                
+                showUndoToast(`שוחזרו ${addedCount} פריטים בהצלחה`, async () => {
+                     for(let item of itemsToAdd) {
+                        await deleteCouponFromFirestore(item.id);
+                    }
+                    coupons = backup;
+                    renderCoupons();
+                    updateTotal();
+                });
+            } else {
+                alert(`כל הפריטים כבר קיימים בארנק (${skippedCount} כפולים)`);
+            }
+            document.getElementById('dataMenu').classList.add('hidden');
+        };
+
         function generateCustomText(data) {
             return data.map(c => `
 ----------------------------------------
@@ -710,9 +795,12 @@
             `).join('\n').trim();
         }
 
+        // פונקציית פענוח משופרת (Regex) - גמישה יותר לרווחים ומקפים
         function parseCustomText(text) {
             const items = [];
-            const blocks = text.split('----------------------------------------');
+            // מפצל לפי קווים מפרידים (3 מקפים או יותר)
+            const blocks = text.split(/-{3,}/);
+            
             blocks.forEach(block => {
                 if(!block.trim()) return;
                 const lines = block.split('\n').map(l => l.trim()).filter(l => l);
@@ -735,6 +823,7 @@
                     if(key === 'רשימת סניפים') newItem.stores = val ? val.split(',').map(s=>s.trim()) : [];
                     if(key === 'תמונה (לא לגעת)') newItem.image = val;
                 });
+
                 if(newItem.store) items.push(newItem);
             });
             return items;
@@ -756,6 +845,7 @@
             document.getElementById('dataMenu').classList.add('hidden');
         };
 
+        // פונקציית ייבוא קבצים משופרת - מטפלת בשגיאות
         window.handleFileImport = (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -763,15 +853,21 @@
             reader.onload = async (e) => {
                 try {
                     let imported = [];
-                    const content = e.target.result.trim();
+                    // ניקוי תווים נסתרים (BOM)
+                    const content = e.target.result.trim().replace(/^[\uFEFF\u00A0]+/, '');
                     
                     if (content.startsWith('[')) {
-                        imported = JSON.parse(content);
+                        try {
+                            imported = JSON.parse(content);
+                        } catch(jsonErr) {
+                            console.warn("JSON Parse failed, trying text mode", jsonErr);
+                            imported = parseCustomText(content);
+                        }
                     } else {
                         imported = parseCustomText(content);
                     }
 
-                    if (Array.isArray(imported)) {
+                    if (Array.isArray(imported) && imported.length > 0) {
                         const backup = JSON.parse(JSON.stringify(coupons));
                         let addedItems = [];
                         let skippedCount = 0;
@@ -812,12 +908,14 @@
                             alert(`לא נוספו פריטים חדשים (${skippedCount} כפולים זוהו)`);
                         }
                     } else {
-                        alert('פורמט קובץ לא מזוהה');
+                        alert('פורמט קובץ לא מזוהה או שהקובץ ריק');
                     }
                 } catch (err) {
                     console.error(err);
-                    alert('שגיאה בקריאת הקובץ');
+                    alert('שגיאה בקריאת הקובץ: ' + err.message);
                 }
+                // איפוס ה-input כדי שאפשר יהיה להעלות את אותו קובץ שוב אם צריך
+                event.target.value = '';
             };
             reader.readAsText(file);
         };
