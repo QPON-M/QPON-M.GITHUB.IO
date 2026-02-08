@@ -1,7 +1,8 @@
-const CACHE_NAME = 'qpon-m-v1';
+const CACHE_NAME = 'qpon-m-v2';
 const urlsToCache = [
   './index.html',
   './manifest.json',
+  './icon.jpg',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
