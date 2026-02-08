@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qpon-m-v2';
+const CACHE_NAME = 'qpon-m-v3';
 const urlsToCache = [
   './index.html',
   './manifest.json',
