@@ -134,7 +134,6 @@
             bottom: 50px;
         }
         
-        /* סגנון לאייקון האפליקציה */
         .app-icon {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: 2px solid rgba(255,255,255,0.1);
@@ -435,7 +434,6 @@
             db = getFirestore(app);
         } catch (e) { console.error("Firebase Init Error:", e); }
 
-        // --- Constants from SmartSave (Required for proper data structure) ---
         const STORES_CARREFOUR = ['קרפור', 'Carrefour', 'Hyper', 'City', 'Market', 'יינות ביתן', 'מגה בעיר', 'שוק מהדרין', 'ביתן מרקט'];
         const STORES_MAX = ['Fox', 'פוקס', 'Fox Home', 'American Eagle', 'Mango', 'Laline', 'Billabong', "Sack's", 'Terminal X', "The Children's Place", 'Foot Locker', 'Flying Tiger', 'Shilav', 'Golf', 'Golf & Co', 'Intima', 'Polgat', 'Kitan', 'Adika', 'Castro', 'Hoodies', 'Top Ten', 'Urbanica', 'Kiko Milano', 'Yves Rocher', 'Steimatzky', 'KSP', 'Ace', 'Auto Depot', 'Hamashbir', 'Mega Sport', 'Opticana', 'Aldo', 'Gali', 'Timberland', 'Lee Cooper', 'Nine West', 'Vardinon', 'Naaman'];
         const STORES_ICARD = ['Victory', 'ויקטורי', 'Nizat Haduvdevan', 'ניצת הדובדבן', 'King Store', 'קינג סטור', "Shuk Ha'ir", 'שוק העיר', 'Machsanei HaShuk', 'מחסני השוק', 'Fox', 'פוקס', 'Fox Home', 'פוקס הום', 'American Eagle', 'Mango', 'Laline', 'Billabong', 'Golf', 'גולף', 'Golf & Co', 'Vardinon', 'ורדינון', 'Naaman', 'נעמן', 'Intima', 'Kitan', 'Adidas', 'אדידס', 'Nike', 'נייקי', 'Foot Locker', 'פוט לוקר', 'Mega Sport', 'מגה ספורט', 'H&O', 'Delta', 'דלתא', 'Gali', 'גלי', 'Lee Cooper', 'לי קופר', 'Timberland', 'Castro', 'קסטרו', 'Hoodies', 'Top Ten', 'Renuar', 'רנואר', 'TwentyFourSeven', 'Steimatzky', 'סטימצקי', 'Tzomet Sfarim', 'צומת ספרים', 'Shekem Electric', 'שקם אלקטריק', 'Home Center', 'הום סנטר', 'ACE', 'אייס', 'Cinema City', 'סינמה סיטי', 'iJump', 'Holmes Place'];
@@ -499,7 +497,6 @@
                 if (docSnap.exists()) {
                     coupons = docSnap.data().coupons || [];
                 } else {
-                    // Logic from SmartSave: Load default coupons for specific user
                     if (user.email === 'meirhadad74@gmail.com') coupons = defaultCoupons;
                     else coupons = [];
                     await saveToFirestore();
@@ -533,7 +530,6 @@
             });
         }
 
-        // --- AUTH LOGIC (Standard from SmartSave) ---
         window.handleGoogleLogin = async () => {
             try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
             catch (e) { document.getElementById('authError').innerText = e.message; document.getElementById('authError').classList.remove('hidden'); }
@@ -541,7 +537,7 @@
 
         window.handleLogout = async () => {
             await signOut(auth);
-            toggleUserMenu(); // Close menu
+            toggleUserMenu(); 
         };
 
         window.handleSwitchAccount = async () => {
@@ -551,26 +547,21 @@
             try {
                 await signInWithPopup(auth, provider);
             } catch (e) { console.error(e); }
-            toggleUserMenu(); // Close menu
+            toggleUserMenu(); 
         };
 
-        // --- User Menu Logic ---
         window.toggleUserMenu = () => {
             const menu = document.getElementById('userMenuDropdown');
             menu.classList.toggle('hidden');
         };
 
-        // Close menus when clicking outside
         document.addEventListener('click', (e) => {
-            // User Menu
             if (!e.target.closest('#userAvatar') && !e.target.closest('#userMenuDropdown')) {
                 document.getElementById('userMenuDropdown')?.classList.add('hidden');
             }
-            // Card Menu
             if (!e.target.closest('[id^="menu-"]') && !e.target.closest('button[onclick^="toggleMenu"]')) {
                  document.querySelectorAll('[id^="menu-"]').forEach(el => el.classList.add('hidden'));
             }
-            // Data Menu
              if (!e.target.closest('#dataMenu') && !e.target.closest('button[onclick="toggleDataMenu()"]')) {
                 document.getElementById('dataMenu')?.classList.add('hidden');
             }
@@ -660,7 +651,6 @@
             event.stopPropagation();
         };
 
-        // --- Custom Text Formatter ---
         function generateCustomText(data) {
             return data.map(c => `
 ----------------------------------------
@@ -678,6 +668,7 @@
             `).join('\n').trim();
         }
 
+        // --- Parsing Logic taken EXACTLY from uploaded file ---
         function parseCustomText(text) {
             const items = [];
             const blocks = text.split('----------------------------------------');
@@ -709,6 +700,7 @@
             });
             return items;
         }
+        // ---------------------------------------------------
 
         window.downloadData = () => {
             const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(generateCustomText(coupons));
@@ -726,6 +718,7 @@
             document.getElementById('dataMenu').classList.add('hidden');
         };
 
+        // --- Import Logic taken EXACTLY from uploaded file ---
         window.handleFileImport = (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -790,6 +783,7 @@
             };
             reader.readAsText(file);
         };
+        // ---------------------------------------------------
 
         window.togglePin = async (id) => {
             const idx = coupons.findIndex(c => c.id === id);
@@ -840,7 +834,6 @@
             }
         };
 
-        // --- Undo Functionality ---
         window.showUndoToast = (message, undoAction) => {
             const toast = document.getElementById('undoToast');
             const msgEl = document.getElementById('toastMessage');
@@ -944,7 +937,6 @@
             });
         };
 
-        // --- Store Modal Logic (with Edit) ---
         window.openStoresModal = (id) => {
             currentStoreEditId = id;
             isStoreEditMode = false;
