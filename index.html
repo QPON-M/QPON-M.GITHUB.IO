@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Qpon-M">
 
-    <link rel="icon" type="image/jpeg" href="icon.jpg">
-    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/6021/6021966.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6021/6021966.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -165,8 +165,7 @@
     <div id="authOverlay" class="fixed inset-0 z-50 bg-gray-100 dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-gray-200 dark:border-gray-800">
             <div class="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg app-icon bg-white dark:bg-gray-800">
-                <img src="icon.jpg" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/6021/6021966.png'" 
+                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021966.png" 
                      class="w-full h-full object-cover" 
                      alt="App Icon">
             </div>
@@ -184,8 +183,7 @@
     <header class="glass sticky top-0 z-40 px-6 py-4 flex justify-between items-center shadow-sm backdrop-blur-md">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <img src="icon.jpg" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/6021/6021966.png'" 
+                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021966.png" 
                      class="w-full h-full object-cover" 
                      alt="Logo">
             </div>
@@ -423,14 +421,15 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // השתמשתי ב-Config של DDD.HTML כי אמרת ששם זה עובד טוב יותר
         const firebaseConfig = {
-            apiKey: "AIzaSyBnRk-Os6EvJcFIdpl-lICc9w-E4pQ74nE",
-            authDomain: "linkmanager-fdac5.firebaseapp.com",
-            projectId: "linkmanager-fdac5",
-            storageBucket: "linkmanager-fdac5.firebasestorage.app",
-            messagingSenderId: "532683691813",
-            appId: "1:532683691813:web:5cf639e32a715c626eeccc",
-            measurementId: "G-NVN4E8TDGE"
+            apiKey: "AIzaSyBo8rX2FMj-nu4AuY6Kn04RywjWvQlRI7A",
+            authDomain: "mhkmp-d6d0a.firebaseapp.com",
+            projectId: "mhkmp-d6d0a",
+            storageBucket: "mhkmp-d6d0a.firebasestorage.app",
+            messagingSenderId: "17729502517",
+            appId: "1:17729502517:web:5b3bb42670b9710c26e07c",
+            measurementId: "G-M785YSBP4V"
         };
 
         let app, auth, db, user;
@@ -462,8 +461,10 @@
                     userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
                     if(emailDisplay) emailDisplay.innerText = user.email;
                     
-                    // טעינה היברידית - קודם מקומי, אחר כך ענן
+                    // טוען קודם מהמטמון כדי שהמשתמש יראה משהו מיד
                     loadFromLocalCache(); 
+                    
+                    // ואז דורס מהענן כדי להבטיח שהמידע נכון
                     await loadDataFromFirestore();
                     
                     checkExpirations(); 
@@ -478,7 +479,6 @@
             if ("Notification" in window) Notification.requestPermission();
         }
 
-        // --- מנגנון טעינה היברידי ---
         function loadFromLocalCache() {
             if(!user) return;
             const cached = localStorage.getItem(`qpon_cache_${user.uid}`);
@@ -487,7 +487,6 @@
                     coupons = JSON.parse(cached);
                     renderCoupons();
                     updateTotal();
-                    console.log("Loaded from cache");
                 } catch(e) { console.error("Cache parse error", e); }
             }
         }
@@ -496,47 +495,48 @@
             if (!user) return;
             document.getElementById('dataLoader').classList.remove('hidden');
             try {
+                // שיטת DDD: טעינת כל המסמך בבת אחת
                 const docRef = doc(db, "wallets", user.uid);
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
                     const serverData = docSnap.data().coupons || [];
-                    // עדכון הנתונים רק אם יש מידע (מונע מחיקה בטעות)
-                    if (serverData.length > 0 || coupons.length === 0) {
-                        coupons = serverData;
-                        // עדכון המטמון המקומי
-                        localStorage.setItem(`qpon_cache_${user.uid}`, JSON.stringify(coupons));
-                    }
+                    coupons = serverData;
+                    // עדכון המטמון המקומי
+                    localStorage.setItem(`qpon_cache_${user.uid}`, JSON.stringify(coupons));
                 } else {
-                    // יצירת מסמך ראשוני אם לא קיים
-                    if (coupons.length === 0) {
-                        coupons = [];
-                        await saveToFirestore();
+                    // יצירת מסמך ראשוני
+                    if(coupons.length === 0) {
+                        await saveToFirestore(true); // שמירה שקטה
                     }
                 }
                 renderCoupons();
                 updateTotal();
             } catch (e) { 
-                console.error("Error loading form cloud", e); 
-                // במקרה שגיאה - אנחנו עדיין מסתמכים על המטמון שנטען כבר
+                console.error("Cloud Error:", e);
+                // במקרה שגיאה נשארים עם המטמון המקומי
             } 
             finally { document.getElementById('dataLoader').classList.add('hidden'); }
         }
 
-        async function saveToFirestore() {
+        // הפונקציה הקריטית - שמירה אטומית + טיפול בשגיאות
+        async function saveToFirestore(silent = false) {
             if (!user) return;
-            // שמירה למטמון מיידית
+            
+            // 1. שמירה מהירה למקומי
             localStorage.setItem(`qpon_cache_${user.uid}`, JSON.stringify(coupons));
             
-            // שמירה לענן
+            // 2. שמירה לענן עם ווידוא הצלחה
             try {
                 await setDoc(doc(db, "wallets", user.uid), { 
                     coupons: coupons, 
                     lastUpdated: new Date().toISOString() 
                 });
             } catch (e) {
-                console.error("Cloud save failed:", e);
-                // ניתן להוסיף כאן חיווי למשתמש שהשמירה לענן נכשלה
+                console.error("Critical Cloud Save Error:", e);
+                if (!silent) {
+                    alert("שגיאה! הנתונים נשמרו במכשיר אך לא הצליחו לעלות לענן. בדוק את החיבור לרשת.\n" + e.message);
+                }
             }
             renderCoupons();
             updateTotal();
@@ -554,7 +554,7 @@
                 if (diffDays === 90) msg = `ההטבה ב-${c.store} תפוג בעוד 3 חודשים`;
                 else if (diffDays === 30) msg = `שים לב! ההטבה ב-${c.store} תפוג בעוד חודש`;
                 else if (diffDays === 7) msg = `דחוף! ההטבה ב-${c.store} תפוג בעוד שבוע`;
-                if (msg) new Notification("Qpon-M תזכורת", { body: msg, icon: "icon.jpg" });
+                if (msg) new Notification("Qpon-M תזכורת", { body: msg, icon: "https://cdn-icons-png.flaticon.com/512/6021/6021966.png" });
             });
         }
 
@@ -920,11 +920,12 @@
                 coupons.push({ id: Date.now(), isPinned: false, ...couponData });
             }
             
-            // שמירה אופטימית
+            // עדכון UI מיידי (אופטימי)
             renderCoupons();
             updateTotal();
             window.closeModal('addModal');
             
+            // שמירה בפועל
             await saveToFirestore();
 
             showUndoToast(editId ? "ההטבה עודכנה" : "ההטבה נוספה", async () => {
