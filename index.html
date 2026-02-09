@@ -162,7 +162,7 @@
 
     <input type="file" id="importFileInput" accept=".txt,.json" class="hidden" onchange="handleFileImport(event)">
 
-    <div id="authOverlay" class="fixed inset-0 z-50 bg-gray-100 dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+    <div id="authOverlay" class="fixed inset-0 z-50 bg-gray-100 dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 transition-opacity duration-500 hidden">
         <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-gray-200 dark:border-gray-800">
             <div class="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg app-icon bg-white dark:bg-gray-800">
                 <img src="icon.jpg" 
@@ -235,6 +235,10 @@
             <div class="relative group">
                 <div id="userAvatar" onclick="toggleUserMenu()" class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-indigo-500 cursor-pointer hidden transition hover:scale-105"></div>
                 
+                <button id="loginButton" onclick="showAuthOverlay()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-gray-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                    <i class="fas fa-user"></i>
+                </button>
+
                 <div id="userMenuDropdown" class="hidden absolute top-12 left-0 bg-white dark:bg-[#1e293b] shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 w-48 z-50 overflow-hidden">
                     <div class="p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                         <p id="userEmailDisplay" class="text-xs text-gray-500 dark:text-gray-400 truncate font-mono"></p>
@@ -454,9 +458,9 @@
                 document.getElementById('dataLoader').classList.remove('hidden');
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
-                        document.getElementById('authOverlay').classList.add('hidden');
                         document.getElementById('userAvatar').src = user.photoURL || '';
                         document.getElementById('userAvatar').classList.remove('hidden');
+                        document.getElementById('loginButton').classList.add('hidden');
                         document.getElementById('userEmailDisplay').innerText = user.email || 'אורח';
                         await loadFromFirestore(user.uid);
                     } else {
@@ -464,7 +468,8 @@
                         coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
                         renderCoupons();
                         updateTotal();
-                        document.getElementById('authOverlay').classList.remove('hidden');
+                        document.getElementById('userAvatar').classList.add('hidden');
+                        document.getElementById('loginButton').classList.remove('hidden');
                     }
                     document.getElementById('dataLoader').classList.add('hidden');
                 });
@@ -475,10 +480,15 @@
             }
         }
 
+        window.showAuthOverlay = () => {
+            document.getElementById('authOverlay').classList.remove('hidden');
+        };
+
         window.handleGoogleLogin = async () => {
             try {
                 document.getElementById('authError').classList.add('hidden');
                 const result = await signInWithPopup(auth, provider);
+                document.getElementById('authOverlay').classList.add('hidden');
                 // Successful login, onAuthStateChanged will handle loading
             } catch (error) {
                 console.error(error);
@@ -489,7 +499,7 @@
 
         window.handleSwitchAccount = async () => {
             await handleLogout();
-            handleGoogleLogin();
+            showAuthOverlay();
         };
 
         window.handleLogout = async () => {
@@ -667,6 +677,67 @@
                 coupons[couponIdx].stores[storeIdx] = newVal;
                 await saveToFirestore();
             }
+        };
+
+        function parseBackupText(text) {
+            const couponsParsed = [];
+            const entries = text.split('----------------------------------------').slice(1);  // Skip first empty if any
+            entries.forEach(entry => {
+                entry = entry.trim();
+                if (!entry) return;
+                const lines = entry.split('\n');
+                const coupon = {};
+                lines.forEach(line => {
+                    if (line.includes(':')) {
+                        const [key, value] = line.split(':', 1).map(s => s.trim());
+                        if (key === 'חנות') coupon.store = value;
+                        else if (key === 'תיאור') coupon.title = value;
+                        else if (key === 'סכום') coupon.value = parseInt(value) || 0;
+                        else if (key === 'תוקף') coupon.exp = value;
+                        else if (key === 'קוד') coupon.code = value;
+                        else if (key === 'קטגוריה') coupon.category = value;
+                        else if (key === 'קישור') coupon.link = value;
+                        else if (key === 'נעוץ') coupon.isPinned = value === 'כן';
+                        else if (key === 'רשימת סניפים') coupon.stores = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                        else if (key.startsWith('תמונה')) coupon.image = value;
+                    }
+                });
+                if (Object.keys(coupon).length) couponsParsed.push(coupon);
+            });
+            return couponsParsed;
+        }
+
+        window.handleFileImport = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const text = e.target.result;
+                let importedCoupons;
+                if (file.type === 'application/json') {
+                    importedCoupons = JSON.parse(text);
+                } else if (file.type === 'text/plain') {
+                    importedCoupons = parseBackupText(text);
+                } else {
+                    alert('פורמט קובץ לא נתמך. נסה TXT או JSON.');
+                    return;
+                }
+                const backup = JSON.parse(JSON.stringify(coupons));
+                importedCoupons.forEach(imp => {
+                    const newId = Date.now() + Math.random();  // Unique ID
+                    coupons.push({ id: newId, isPinned: imp.isPinned || false, ...imp });
+                });
+                renderCoupons();
+                updateTotal();
+                await saveToFirestore();
+                showUndoToast('הנתונים יובאו', async () => {
+                    coupons = backup;
+                    await saveToFirestore();
+                    renderCoupons();
+                    updateTotal();
+                });
+            };
+            reader.readAsText(file);
         };
 
         // The rest of the original script from index.html remains unchanged...
