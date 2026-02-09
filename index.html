@@ -9,10 +9,8 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Qpon-M">
 
-    <link rel="icon" type="image/jpeg" href="icon.jpg">
-    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/6021/6021966.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -20,25 +18,11 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#6366f1',
-                        secondary: '#ec4899',
-                        darkBg: '#0f172a',
-                        cardDark: '#1e293b'
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.2s ease-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                    },
+                    colors: { primary: '#6366f1', secondary: '#ec4899', darkBg: '#0f172a', cardDark: '#1e293b' },
+                    animation: { 'fade-in': 'fadeIn 0.2s ease-out', 'slide-up': 'slideUp 0.3s ease-out' },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.95)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(100%)' },
-                            '100%': { transform: 'translateY(0)' },
-                        }
+                        fadeIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+                        slideUp: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(0)' } }
                     }
                 }
             }
@@ -64,85 +48,38 @@
         }
 
         .category-chip.active { background: #6366f1; color: white; border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.4); }
-
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #6366f1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
         .pinned-card {
             border: 2px solid #eab308 !important; 
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.15) !important;
             background: linear-gradient(to bottom right, rgba(234, 179, 8, 0.05), transparent) !important;
         }
-
         @media (min-width: 768px) {
-            .desktop-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-                gap: 1.5rem;
-            }
+            .desktop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         }
-
+        
+        /* Modal & Toast Animations */
         .modal-content-mobile { animation: slideUp 0.3s ease-out forwards; }
         .modal-content-desktop { animation: fadeIn 0.2s ease-out forwards; }
-        
-        .modal-scrollable {
-            max-height: 85vh;
-            overflow-y: auto;
-            padding-bottom: 20px;
-        }
-        
+        .modal-scrollable { max-height: 85vh; overflow-y: auto; padding-bottom: 20px; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        #undoToast {
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        #undoToast.hidden-toast {
-            transform: translate(-50%, 100px);
-            opacity: 0;
-            pointer-events: none;
-        }
-        #undoToast.visible-toast {
-            transform: translate(-50%, 0);
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            z-index: 100;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
-        }
-
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
-        }
-        
-        .app-icon {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 2px solid rgba(255,255,255,0.1);
-        }
+        /* Toast Styles */
+        #undoToast { transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        #undoToast.hidden-toast { transform: translate(-50%, 100px); opacity: 0; pointer-events: none; }
+        #undoToast.visible-toast { transform: translate(-50%, 0); opacity: 1; pointer-events: all; }
+        #syncStatus { font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; transition: all 0.3s; }
+        .sync-ok { color: #22c55e; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .sync-error { color: #ef4444; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .sync-loading { color: #eab308; background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); }
     </style>
 </head>
 <body class="dark antialiased pb-28 min-h-screen">
 
-    <div id="toast">הקוד הועתק בהצלחה!</div>
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50">הקוד הועתק!</div>
 
     <div id="undoToast" class="fixed bottom-24 left-1/2 z-50 w-[90%] max-w-sm bg-gray-900 text-white rounded-xl shadow-2xl border border-gray-700 overflow-hidden hidden-toast flex flex-col">
         <div class="flex items-center justify-between px-5 py-4">
@@ -155,25 +92,19 @@
                 <i class="fas fa-undo text-xs transform group-hover:-rotate-180 transition duration-500"></i>
             </button>
         </div>
-        <div class="h-1 w-full bg-gray-800">
-            <div id="toastProgress" class="h-full bg-indigo-500 w-full"></div>
-        </div>
+        <div class="h-1 w-full bg-gray-800"><div id="toastProgress" class="h-full bg-indigo-500 w-full"></div></div>
     </div>
 
     <input type="file" id="importFileInput" accept=".txt,.json" class="hidden" onchange="handleFileImport(event)">
 
-    <div id="authOverlay" class="fixed inset-0 z-50 bg-gray-100 dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 transition-opacity duration-500 hidden">
+    <div id="authOverlay" class="fixed inset-0 z-50 bg-gray-100 dark:bg-[#0f172a] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="glass p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-gray-200 dark:border-gray-800">
-            <div class="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg app-icon bg-white dark:bg-gray-800">
-                <img src="icon.jpg" 
-                     onerror="this.src='icon_gray.jpg'" 
-                     class="w-full h-full object-cover" 
-                     alt="App Icon">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg app-icon bg-white dark:bg-gray-800 p-2">
+                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021966.png" class="w-full h-full object-cover rounded-xl" alt="App Icon">
             </div>
             <h1 class="text-3xl font-black mb-2 dark:text-white">Qpon-M</h1>
-            <p class="text-gray-500 mb-8 text-sm">התחבר כדי לסנכרן ולאבטח את הארנק שלך</p>
-            
-            <button id="googleLoginBtn" onclick="handleGoogleLogin()" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 py-3.5 rounded-xl flex items-center justify-center gap-3 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm active:scale-95">
+            <p class="text-gray-500 mb-8 text-sm">התחבר כדי לגשת לארנק שלך מכל מכשיר</p>
+            <button onclick="handleGoogleLogin()" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 py-3.5 rounded-xl flex items-center justify-center gap-3 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm active:scale-95">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6">
                 התחבר עם Google
             </button>
@@ -183,48 +114,27 @@
 
     <header class="glass sticky top-0 z-40 px-6 py-4 flex justify-between items-center shadow-sm backdrop-blur-md">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <img src="icon.jpg" 
-                     onerror="this.src='icon_gray.jpg'" 
-                     class="w-full h-full object-cover" 
-                     alt="Logo">
+            <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
+                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021966.png" class="w-full h-full object-cover rounded-lg" alt="Logo">
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-tight dark:text-white">Qpon-M</h1>
-                <p class="text-[10px] opacity-70 flex items-center gap-2 dark:text-gray-300">
-                    <span id="installBtn" class="hidden cursor-pointer text-indigo-400 font-bold hover:underline" onclick="installPWA()">
-                        <i class="fas fa-download"></i> התקן
-                    </span>
-                    <span id="connectionStatus" class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> מחובר</span>
-                </p>
+                <div class="flex items-center gap-2">
+                    <span id="connectionStatus" class="flex items-center gap-1 text-[10px] text-green-500"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> מחובר</span>
+                    <span id="syncStatus" class="hidden">סנכרון...</span>
+                </div>
             </div>
         </div>
         <div class="flex gap-2 relative items-center">
             <button onclick="toggleDataMenu()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-gray-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition relative">
                 <i class="fas fa-cloud-upload-alt"></i>
             </button>
-            
             <div id="dataMenu" class="hidden absolute top-12 left-0 bg-white dark:bg-[#1e293b] shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden w-48 z-50">
-                <button onclick="loadHardcodedBackup()" class="w-full text-right px-4 py-3 text-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
-                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400"><i class="fas fa-magic"></i></div>
-                    <div>
-                        <span class="font-bold block">שחזר נתונים מהשיחה</span>
-                        <span class="text-[10px] opacity-60">טעינה אוטומטית</span>
-                    </div>
-                </button>
                 <button onclick="downloadData()" class="w-full text-right px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
-                    <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400"><i class="fas fa-file-alt"></i></div>
-                    <div>
-                        <span class="font-bold block">הורד (טקסט)</span>
-                        <span class="text-[10px] opacity-60">קריא לעריכה</span>
-                    </div>
+                    <i class="fas fa-file-alt text-green-500"></i> גיבוי לקובץ
                 </button>
                 <button onclick="triggerUpload()" class="w-full text-right px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400"><i class="fas fa-upload"></i></div>
-                    <div>
-                        <span class="font-bold block">העלה קובץ</span>
-                        <span class="text-[10px] opacity-60">טקסט או JSON</span>
-                    </div>
+                    <i class="fas fa-upload text-blue-500"></i> שחזור מקובץ
                 </button>
             </div>
 
@@ -234,18 +144,10 @@
 
             <div class="relative group">
                 <div id="userAvatar" onclick="toggleUserMenu()" class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-indigo-500 cursor-pointer hidden transition hover:scale-105"></div>
-                
-                <button id="loginButton" onclick="showAuthOverlay()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-gray-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                    <i class="fas fa-user"></i>
-                </button>
-
                 <div id="userMenuDropdown" class="hidden absolute top-12 left-0 bg-white dark:bg-[#1e293b] shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 w-48 z-50 overflow-hidden">
                     <div class="p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                         <p id="userEmailDisplay" class="text-xs text-gray-500 dark:text-gray-400 truncate font-mono"></p>
                     </div>
-                    <button onclick="handleSwitchAccount()" class="w-full text-right px-4 py-3 text-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center gap-3 font-medium">
-                        <i class="fas fa-users-cog"></i> החלף משתמש
-                    </button>
                     <button onclick="handleLogout()" class="w-full text-right px-4 py-3 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 flex items-center gap-3">
                         <i class="fas fa-sign-out-alt"></i> יציאה
                     </button>
@@ -255,10 +157,7 @@
     </header>
 
     <main class="container mx-auto px-4 pt-6 max-w-md md:max-w-6xl">
-
-        <div id="dataLoader" class="flex justify-center py-4 hidden">
-            <div class="loader"></div>
-        </div>
+        <div id="dataLoader" class="hidden flex justify-center py-4"><div class="loader"></div></div>
 
         <div class="flex justify-between items-end mb-6 px-1">
             <div>
@@ -266,20 +165,18 @@
                 <h2 class="text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight" id="totalValueDisplay">₪0</h2>
             </div>
             <button onclick="openPaymentSimulator()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/30 active:scale-95 transition flex items-center gap-2">
-                <i class="fas fa-search-location"></i> איפה להשתמש?
+                <i class="fas fa-search-location"></i> איפה לקנות?
             </button>
         </div>
 
         <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar px-1" id="categoryFilter">
             <button onclick="filterCategory('all')" class="category-chip active px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 text-sm font-medium whitespace-nowrap transition bg-white dark:bg-gray-800">הכל</button>
-            <button onclick="filterCategory('food')" class="category-chip px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 text-sm font-medium whitespace-nowrap transition bg-white dark:bg-gray-800">🛒 סופר ומזון</button>
+            <button onclick="filterCategory('food')" class="category-chip px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 text-sm font-medium whitespace-nowrap transition bg-white dark:bg-gray-800">🛒 מזון</button>
             <button onclick="filterCategory('fashion')" class="category-chip px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 text-sm font-medium whitespace-nowrap transition bg-white dark:bg-gray-800">👕 אופנה</button>
             <button onclick="filterCategory('home')" class="category-chip px-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 text-sm font-medium whitespace-nowrap transition bg-white dark:bg-gray-800">🏠 לבית</button>
         </div>
 
-        <div id="couponsContainer" class="space-y-4 pb-24 desktop-grid">
-            </div>
-
+        <div id="couponsContainer" class="space-y-4 pb-24 desktop-grid"></div>
     </main>
 
     <button onclick="openAddModal()" class="fixed bottom-6 left-6 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-xl shadow-indigo-500/40 flex items-center justify-center text-white text-2xl z-40 hover:scale-110 active:scale-95 transition-all duration-300">
@@ -288,91 +185,61 @@
 
     <div id="addModal" class="fixed inset-0 z-50 hidden flex items-end md:items-center justify-center p-0 md:p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal('addModal')"></div>
-        
         <div class="relative w-full bg-white dark:bg-[#1e293b] rounded-t-3xl md:rounded-3xl p-6 shadow-2xl border border-gray-100 dark:border-gray-700 md:max-w-lg transform transition-all modal-content-mobile md:modal-content-desktop modal-scrollable">
-            
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4 md:hidden"></div>
-            
-            <button onclick="closeModal('addModal')" class="hidden md:flex absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-                <i class="fas fa-times text-gray-500 dark:text-gray-300"></i>
-            </button>
+            <button onclick="closeModal('addModal')" class="hidden md:flex absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"><i class="fas fa-times text-gray-500 dark:text-gray-300"></i></button>
 
-            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white" id="modalTitle">הוספת הטבה חדשה</h3>
-
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white" id="modalTitle">הוספת הטבה</h3>
             <div class="flex gap-3 mb-6">
-                <button onclick="document.getElementById('imageInput').click()" class="flex-1 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 py-3.5 rounded-2xl flex flex-col items-center gap-1.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 active:scale-95 transition border border-indigo-100 dark:border-indigo-800">
-                    <i class="fas fa-camera text-2xl"></i> תמונה
-                </button>
+                <button onclick="document.getElementById('imageInput').click()" class="flex-1 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 py-3.5 rounded-2xl flex flex-col items-center gap-1.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800"><i class="fas fa-camera text-2xl"></i> תמונה</button>
                 <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="processImage(this)">
-                
-                <button onclick="startNFCScan()" class="flex-1 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 py-3.5 rounded-2xl flex flex-col items-center gap-1.5 text-sm font-bold text-blue-600 dark:text-blue-400 active:scale-95 transition border border-blue-100 dark:border-blue-800">
-                    <i class="fas fa-wifi text-2xl"></i> NFC
-                </button>
+                <button onclick="startNFCScan()" class="flex-1 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 py-3.5 rounded-2xl flex flex-col items-center gap-1.5 text-sm font-bold text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800"><i class="fas fa-wifi text-2xl"></i> NFC</button>
             </div>
             
             <form onsubmit="handleFormSubmit(event)" class="space-y-4">
                 <input type="hidden" id="editId">
+                <div id="imagePreviewContainer" class="hidden mb-4"><div id="imagePreview" class="w-full h-32 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 relative"></div></div>
                 
-                <div id="imagePreviewContainer" class="hidden mb-4">
-                    <div id="imagePreview" class="w-full h-32 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 relative">
-                    </div>
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="col-span-1 md:col-span-2">
                          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">שם הכרטיס/רשת</label>
-                         <input type="text" id="addStore" placeholder="למשל: שופרסל, זארה..." required 
-                            class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white placeholder-gray-400">
+                         <input type="text" id="addStore" placeholder="שופרסל, זארה..." required class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
                     </div>
-
                     <div class="col-span-1 md:col-span-2">
-                        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">תיאור קצר (יופיע מתחת לשם)</label>
-                        <input type="text" id="addTitle" placeholder="למשל: הטבה אישית, Gift Card" 
-                           class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white placeholder-gray-400">
+                        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">תיאור (אופציונלי)</label>
+                        <input type="text" id="addTitle" placeholder="Gift Card, מתנה..." class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
                    </div>
-                    
                     <div>
                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">שווי (₪)</label>
-                        <input type="number" id="addValue" placeholder="0" 
-                            class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
+                        <input type="number" id="addValue" placeholder="0" class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
                     </div>
-
-                    <div class="relative">
+                    <div>
                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">קטגוריה</label>
-                        <select id="addCategory" class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white appearance-none">
+                        <select id="addCategory" class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
                             <option value="gifts">🎁 כללי</option>
                             <option value="food">🛒 מזון</option>
                             <option value="fashion">👕 אופנה</option>
                             <option value="home">🏠 לבית</option>
                         </select>
-                        <i class="fas fa-chevron-down absolute left-3 top-[60%] -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
                     </div>
-                    
                     <div>
                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">תוקף</label>
                         <input type="date" id="addExp" class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
                     </div>
-
                     <div>
-                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">קוד/ברקוד (אופציונלי)</label>
-                         <input type="text" id="addCode" placeholder="1234-5678..." 
-                            class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white font-mono text-sm tracking-wide">
+                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">קוד (אופציונלי)</label>
+                         <input type="text" id="addCode" placeholder="1234..." class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white font-mono">
                     </div>
-
                     <div class="col-span-1 md:col-span-2">
-                        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">קישור להטבה (אופציונלי)</label>
-                        <input type="url" id="addLink" placeholder="https://..." 
-                           class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white placeholder-gray-400">
-                    </div>
-                    
-                    <div class="col-span-1 md:col-span-2">
+                        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">קישור (אופציונלי)</label>
+                        <input type="url" id="addLink" placeholder="https://..." class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
+                   </div>
+                   <div class="col-span-1 md:col-span-2">
                         <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block mr-1">רשימת חנויות (מופרד בפסיקים)</label>
-                        <input type="text" id="addStores" placeholder="למשל: סניף ירושלים, סניף תל אביב..." 
-                           class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white placeholder-gray-400">
-                    </div>
+                        <input type="text" id="addStores" placeholder="למשל: פוקס, קסטרו, זארה..." class="w-full p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 transition text-gray-900 dark:text-white">
+                   </div>
                 </div>
-
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/20 mt-6 active:scale-95 transition text-lg">שמור בארנק</button>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-500/20 mt-6 active:scale-95 transition text-lg">שמור בענן</button>
             </form>
         </div>
     </div>
@@ -380,29 +247,20 @@
     <div id="storesModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('storesModal')"></div>
         <div class="bg-white dark:bg-[#1e293b] w-full max-w-sm rounded-2xl p-6 relative z-10 shadow-2xl h-[70vh] flex flex-col border border-gray-200 dark:border-gray-700 modal-content-desktop">
-            <button onclick="closeModal('storesModal')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition z-10">
-                <i class="fas fa-times text-gray-500 dark:text-gray-300"></i>
-            </button>
-            
-            <button onclick="toggleStoreEditMode()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition z-10">
-                <i class="fas fa-edit text-indigo-500 dark:text-indigo-400" id="storeEditIcon"></i>
-            </button>
-
+            <button onclick="closeModal('storesModal')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition z-10"><i class="fas fa-times text-gray-500 dark:text-gray-300"></i></button>
+            <button onclick="toggleStoreEditMode()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition z-10"><i class="fas fa-edit text-indigo-500 dark:text-indigo-400" id="storeEditIcon"></i></button>
             <div class="text-center mb-4 mt-2">
                 <h3 class="text-xl font-bold dark:text-white" id="storeModalTitle">רשימת חנויות</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400" id="storeModalSubtitle">תקף בסניפים הבאים:</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400" id="storeModalSubtitle">תקף ברשתות הבאות:</p>
             </div>
-            
             <div id="storeSearchBar" class="relative mb-3">
                 <input type="text" id="modalSearch" onkeyup="filterStoreList()" placeholder="חפש ברשימה..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 pr-10 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
                 <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
-
             <div id="addStoreContainer" class="hidden relative mb-3 flex gap-2">
-                <input type="text" id="newStoreInput" placeholder="שם סניף להוספה..." class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="newStoreInput" placeholder="שם חנות..." class="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500">
                 <button onclick="addNewStore()" class="bg-indigo-600 text-white px-4 rounded-xl hover:bg-indigo-700"><i class="fas fa-plus"></i></button>
             </div>
-
             <div id="storeListContent" class="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar"></div>
         </div>
     </div>
@@ -410,187 +268,215 @@
     <div id="paymentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('paymentModal')"></div>
         <div class="relative w-full bg-white dark:bg-[#1e293b] rounded-2xl p-6 shadow-2xl h-[70vh] flex flex-col md:max-w-md border border-gray-200 dark:border-gray-700 modal-content-desktop">
-            <button onclick="closeModal('paymentModal')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-                <i class="fas fa-times text-gray-500 dark:text-gray-300"></i>
-            </button>
+            <button onclick="closeModal('paymentModal')" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"><i class="fas fa-times text-gray-500 dark:text-gray-300"></i></button>
             <div class="text-center mb-6">
                 <h3 class="text-2xl font-black mb-1 dark:text-white">בדיקת חנות</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400">איפה אתה רוצה לקנות היום?</p>
             </div>
-            <input type="text" id="checkStoreInput" placeholder="הקלד שם (למשל: זארה, פוקס)..." 
-                class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-4 px-5 rounded-xl text-lg font-bold text-center outline-none focus:ring-2 focus:ring-indigo-500 mb-4 transition text-gray-900 dark:text-white"
-                oninput="checkInterception(this.value)">
-            <div id="interceptionResult" class="flex-1 overflow-y-auto space-y-2"></div>
+            <input type="text" id="checkStoreInput" placeholder="זארה, פוקס..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-4 px-5 rounded-xl text-lg font-bold text-center outline-none focus:ring-2 focus:ring-indigo-500 mb-4 transition text-gray-900 dark:text-white" oninput="checkInterception(this.value)">
+            <div id="interceptionResult" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+                <div class="text-center opacity-30 mt-10"><i class="fas fa-search text-5xl mb-4 text-gray-400"></i><p class="text-gray-400">התוצאות יופיעו כאן</p></div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // IMPORTANT: Using the 'mhkmp' config which you confirmed works best
         const firebaseConfig = {
-            apiKey: "AIzaSyCBz8M2dQf9J2l9e4Xh0z0z7bZfhdUVCvk",
-            authDomain: "qpon-m.firebaseapp.com",
-            projectId: "qpon-m",
-            storageBucket: "qpon-m.appspot.com",
-            messagingSenderId: "111461209497",
-            appId: "1:111461209497:web:1e4f7f1e5f2e5a5e5f2e5a"
+            apiKey: "AIzaSyBo8rX2FMj-nu4AuY6Kn04RywjWvQlRI7A",
+            authDomain: "mhkmp-d6d0a.firebaseapp.com",
+            projectId: "mhkmp-d6d0a",
+            storageBucket: "mhkmp-d6d0a.firebasestorage.app",
+            messagingSenderId: "17729502517",
+            appId: "1:17729502517:web:5b3bb42670b9710c26e07c",
+            measurementId: "G-M785YSBP4V"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        let app, auth, db, user;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) { console.error("Firebase Init Error:", e); }
 
         let coupons = [];
         let currentCategory = 'all';
         let currentImageBase64 = null;
         let currentStoreEditId = null;
         let isStoreEditMode = false;
-        let toastTimeout = null;
         let undoCallback = null;
-        let unsubscribeSnapshot = null;
-        let isOnline = navigator.onLine;
+        let toastTimeout = null;
 
-        async function initFirebase() {
-            try {
-                auth.onAuthStateChanged(async (user) => {
-                    if (user) {
-                        document.getElementById('userAvatar').src = user.photoURL || '';
-                        document.getElementById('userAvatar').classList.remove('hidden');
-                        document.getElementById('loginButton').classList.add('hidden');
-                        document.getElementById('userEmailDisplay').innerText = user.email || 'אורח';
-                        await loadFromFirestore(user.uid);
-                    } else {
-                        // Load from localStorage as fallback if offline or no user
-                        coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
-                        renderCoupons();
-                        updateTotal();
-                        document.getElementById('userAvatar').classList.add('hidden');
-                        document.getElementById('loginButton').classList.remove('hidden');
-                    }
-                });
-            } catch (error) {
-                console.error("Firebase init error:", error);
-                alert("שגיאה בחיבור לשרת. נסה שוב מאוחר יותר.");
-            }
+        function updateSyncStatus(status, message) {
+            const el = document.getElementById('syncStatus');
+            el.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${status}`;
+            el.innerText = message;
+            el.classList.remove('hidden');
         }
 
-        window.showAuthOverlay = () => {
-            document.getElementById('authOverlay').classList.remove('hidden');
-        };
-
-        window.handleGoogleLogin = async () => {
-            try {
-                document.getElementById('authError').classList.add('hidden');
-                document.getElementById('dataLoader').classList.remove('hidden');
-                await signInWithRedirect(auth, provider);
-            } catch (error) {
-                console.error(error);
-                document.getElementById('authError').innerText = "שגיאה בהתחברות: " + (error.message || "לא ידוע");
-                document.getElementById('authError').classList.remove('hidden');
-                document.getElementById('dataLoader').classList.add('hidden');
-            }
-        };
-
-        // Handle redirect result after login
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result) {
-                    document.getElementById('authOverlay').classList.add('hidden');
-                    document.getElementById('dataLoader').classList.add('hidden');
+        function init() {
+            onAuthStateChanged(auth, async (currentUserData) => {
+                const overlay = document.getElementById('authOverlay');
+                const userAvatar = document.getElementById('userAvatar');
+                const emailDisplay = document.getElementById('userEmailDisplay');
+                
+                if (currentUserData) {
+                    user = currentUserData;
+                    overlay.classList.add('hidden');
+                    userAvatar.classList.remove('hidden');
+                    userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
+                    if(emailDisplay) emailDisplay.innerText = user.email;
+                    
+                    // Force Cloud Load
+                    await loadDataFromFirestore();
+                    checkExpirations(); 
+                } else {
+                    user = null;
+                    overlay.classList.remove('hidden');
+                    userAvatar.classList.add('hidden');
+                    coupons = [];
+                    renderCoupons();
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-                document.getElementById('authError').innerText = "שגיאה בהתחברות: " + (error.message || "לא ידוע");
-                document.getElementById('authError').classList.remove('hidden');
-                document.getElementById('dataLoader').classList.add('hidden');
             });
+            if ("Notification" in window) Notification.requestPermission();
+        }
 
-        window.handleSwitchAccount = async () => {
-            await handleLogout();
-            showAuthOverlay();
-        };
-
-        window.handleLogout = async () => {
+        // --- Core Cloud Logic (The 'ddd.html' method) ---
+        async function loadDataFromFirestore() {
+            if (!user) return;
+            updateSyncStatus('sync-loading', 'טוען...');
+            document.getElementById('dataLoader').classList.remove('hidden');
+            
             try {
-                await signOut(auth);
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
-                coupons = [];
+                // Reading the SINGLE document 'wallets/{uid}'
+                const docRef = doc(db, "wallets", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    coupons = data.coupons || [];
+                    console.log("Loaded from Cloud:", coupons.length, "items");
+                    updateSyncStatus('sync-ok', 'מחובר ומסונכרן');
+                } else {
+                    // New user or empty wallet
+                    coupons = [];
+                    // Create the doc so it exists
+                    await setDoc(docRef, { coupons: [], lastUpdated: new Date().toISOString() });
+                    updateSyncStatus('sync-ok', 'ארנק חדש נוצר');
+                }
                 renderCoupons();
                 updateTotal();
-            } catch (error) {
-                console.error(error);
-                alert("שגיאה ביציאה");
+            } catch (e) {
+                console.error("Cloud Load Error:", e);
+                updateSyncStatus('sync-error', 'שגיאת רשת');
+                alert("שגיאה בטעינת הנתונים מהענן. בדוק את החיבור לאינטרנט.\n" + e.message);
+            } finally {
+                document.getElementById('dataLoader').classList.add('hidden');
             }
-        };
+        }
 
         async function saveToFirestore() {
-            const user = auth.currentUser;
-            if (!user || !isOnline) {
-                localStorage.setItem('coupons', JSON.stringify(coupons)); // Fallback to local
+            if (!user) {
+                alert("עליך להתחבר כדי לשמור!");
                 return;
             }
+            updateSyncStatus('sync-loading', 'שומר בענן...');
+            
             try {
-                const userDoc = doc(db, 'users', user.uid);
-                await setDoc(userDoc, { coupons }, { merge: true });
-                localStorage.setItem('coupons', JSON.stringify(coupons)); // Sync local
-            } catch (error) {
-                console.error("Save error:", error);
-                alert("שגיאה בשמירה בענן. הנתונים נשמרו מקומית.");
-            }
-        }
-
-        async function loadFromFirestore(uid) {
-            try {
-                const userDoc = doc(db, 'users', uid);
-                if (unsubscribeSnapshot) unsubscribeSnapshot(); // Unsubscribe previous if any
-                unsubscribeSnapshot = onSnapshot(userDoc, (snap) => {
-                    if (snap.exists()) {
-                        coupons = snap.data().coupons || [];
-                        localStorage.setItem('coupons', JSON.stringify(coupons));
-                        renderCoupons();
-                        updateTotal();
-                    } else {
-                        coupons = [];
-                        renderCoupons();
-                        updateTotal();
-                    }
-                }, (error) => {
-                    console.error("Snapshot error:", error);
-                    // Fallback to local
-                    coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
-                    renderCoupons();
-                    updateTotal();
-                    alert("שגיאה בטעינת נתונים מהענן. משתמש בנתונים מקומיים.");
+                // Writing the ENTIRE array to 'wallets/{uid}'
+                await setDoc(doc(db, "wallets", user.uid), { 
+                    coupons: coupons, 
+                    lastUpdated: new Date().toISOString() 
                 });
-            } catch (error) {
-                console.error("Load error:", error);
+                updateSyncStatus('sync-ok', 'נשמר בענן בהצלחה');
+            } catch (e) {
+                console.error("Cloud Save Error:", e);
+                updateSyncStatus('sync-error', 'שגיאת שמירה');
+                alert("השמירה לענן נכשלה! השינויים לא יופיעו במכשירים אחרים.\n" + e.message);
             }
+            renderCoupons();
+            updateTotal();
         }
 
-        window.addEventListener('online', () => {
-            isOnline = true;
-            document.getElementById('connectionStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> מחובר';
-            if (auth.currentUser) saveToFirestore(); // Sync local changes to cloud
-        });
+        // --- Standard App Logic ---
+        window.handleGoogleLogin = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { document.getElementById('authError').innerText = e.message; document.getElementById('authError').classList.remove('hidden'); }
+        };
+        window.handleLogout = async () => { await signOut(auth); toggleUserMenu(); };
+        window.toggleUserMenu = () => { document.getElementById('userMenuDropdown').classList.toggle('hidden'); };
+        window.toggleTheme = () => { 
+            document.body.classList.toggle('dark'); document.body.classList.toggle('light'); 
+            document.getElementById('themeIcon').className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+        };
+        window.filterCategory = (cat) => {
+            currentCategory = cat;
+            document.querySelectorAll('.category-chip').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'shadow-lg');
+                btn.classList.add('bg-white', 'dark:bg-gray-800');
+            });
+            event.target.classList.add('active', 'shadow-lg');
+            event.target.classList.remove('bg-white', 'dark:bg-gray-800');
+            renderCoupons();
+        };
 
-        window.addEventListener('offline', () => {
-            isOnline = false;
-            document.getElementById('connectionStatus').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> מנותק';
-        });
+        window.openPaymentSimulator = () => { document.getElementById('paymentModal').classList.remove('hidden'); setTimeout(()=>document.getElementById('checkStoreInput').focus(), 100); };
+        window.openAddModal = () => { resetForm(); document.getElementById('addModal').classList.remove('hidden'); };
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        window.toggleDataMenu = () => { document.getElementById('dataMenu').classList.toggle('hidden'); };
 
-        // Rest of the script remains the same, but update calls to saveCouponToFirestore/deleteCouponFromFirestore to saveToFirestore
-        // For example:
+        window.openEditModal = (id) => {
+            resetForm();
+            const coupon = coupons.find(c => c.id == id);
+            if (!coupon) return;
+            document.getElementById('modalTitle').innerText = 'עריכת הטבה';
+            document.getElementById('editId').value = coupon.id;
+            document.getElementById('addStore').value = coupon.store;
+            document.getElementById('addTitle').value = coupon.title || ''; 
+            document.getElementById('addValue').value = coupon.value;
+            document.getElementById('addCategory').value = coupon.category;
+            document.getElementById('addExp').value = coupon.exp;
+            document.getElementById('addCode').value = coupon.code || '';
+            document.getElementById('addLink').value = coupon.link || '';
+            document.getElementById('addStores').value = (coupon.stores || []).join(', ');
+            
+            if (coupon.image) {
+                currentImageBase64 = coupon.image;
+                document.getElementById('imagePreview').innerHTML = `<img src="${coupon.image}" class="w-full h-full object-cover">`;
+                document.getElementById('imagePreviewContainer').classList.remove('hidden');
+            }
+            document.getElementById('addModal').classList.remove('hidden');
+            const menu = document.getElementById(`menu-${id}`);
+            if(menu) menu.classList.add('hidden');
+        };
+
+        function resetForm() {
+            document.getElementById('modalTitle').innerText = 'הוספת הטבה';
+            document.getElementById('editId').value = '';
+            document.getElementById('addStore').value = '';
+            document.getElementById('addTitle').value = ''; 
+            document.getElementById('addValue').value = '';
+            document.getElementById('addCategory').value = 'gifts';
+            document.getElementById('addExp').value = '';
+            document.getElementById('addCode').value = '';
+            document.getElementById('addLink').value = '';
+            document.getElementById('addStores').value = '';
+            document.getElementById('imageInput').value = '';
+            currentImageBase64 = null;
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+        }
+
         window.handleFormSubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('editId').value;
             const store = document.getElementById('addStore').value;
             const storesInput = document.getElementById('addStores').value;
             const customStores = storesInput ? storesInput.split(',').map(s => s.trim()).filter(s => s.length > 0) : null;
-
             const backup = JSON.parse(JSON.stringify(coupons)); 
             
             const couponData = {
@@ -605,49 +491,47 @@
                 image: currentImageBase64
             };
             
-            let savedItem = null;
-
             if (editId) {
                 const idx = coupons.findIndex(c => c.id == editId);
                 if (idx > -1) {
                     if (!customStores && coupons[idx].stores) couponData.stores = coupons[idx].stores;
                     coupons[idx] = { ...coupons[idx], ...couponData };
-                    savedItem = coupons[idx];
                 }
             } else {
-                const newId = Date.now();
-                savedItem = { id: newId, isPinned: false, ...couponData };
-                coupons.push(savedItem);
+                coupons.push({ id: Date.now(), isPinned: false, ...couponData });
             }
             
-            renderCoupons();
-            updateTotal();
             window.closeModal('addModal');
-            
-            await saveToFirestore();
+            await saveToFirestore(); // Cloud Save First
 
-            showUndoToast(editId ? "ההטבה עודכנה" : "ההטבה נוספה", async () => {
+            showUndoToast(editId ? "ההטבה עודכנה (ענן)" : "ההטבה נוספה (ענן)", async () => {
                 coupons = backup;
                 await saveToFirestore();
-                renderCoupons();
-                updateTotal();
             });
         };
 
         window.deleteCoupon = async (id) => {
             const backup = JSON.parse(JSON.stringify(coupons));
             coupons = coupons.filter(c => c.id != id);
-            renderCoupons(); 
-            updateTotal();
-            
             await saveToFirestore();
-            
-            showUndoToast("ההטבה נמחקה", async () => {
+            showUndoToast("ההטבה נמחקה (ענן)", async () => {
                 coupons = backup;
                 await saveToFirestore();
-                renderCoupons();
-                updateTotal();
             });
+        };
+
+        window.copyCode = (code) => {
+            navigator.clipboard.writeText(code).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                setTimeout(() => { toast.classList.add('opacity-0'); }, 3000);
+            });
+        };
+
+        window.toggleMenu = (id) => {
+            const menu = document.getElementById(`menu-${id}`);
+            document.querySelectorAll('[id^="menu-"]').forEach(el => { if(el !== menu) el.classList.add('hidden'); });
+            menu.classList.toggle('hidden');
         };
 
         window.togglePin = async (id) => {
@@ -655,105 +539,184 @@
             if (idx > -1) {
                 coupons[idx].isPinned = !coupons[idx].isPinned;
                 await saveToFirestore();
-                renderCoupons(); 
             }
         };
 
-        window.addNewStore = async () => {
-            const input = document.getElementById('newStoreInput');
-            const val = input.value.trim();
-            if (!val) return;
-            
-            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
-            if (couponIdx > -1) {
-                if (!coupons[couponIdx].stores) coupons[couponIdx].stores = [coupons[couponIdx].store];
-                coupons[couponIdx].stores.unshift(val); 
-                await saveToFirestore();
-                input.value = '';
-                updateStoreModalUI();
+        // File/Image/NFC Utils
+        window.processImage = (input) => {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 300;
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        currentImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('imagePreview').innerHTML = `<img src="${currentImageBase64}" class="w-full h-full object-cover">`;
+                        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                    };
+                };
+                reader.readAsDataURL(file);
             }
         };
 
-        window.removeStore = async (storeIdx) => {
-            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
-            if (couponIdx > -1 && coupons[couponIdx].stores) {
-                coupons[couponIdx].stores.splice(storeIdx, 1);
-                await saveToFirestore();
-                updateStoreModalUI();
-            }
-        };
-
-        window.updateStoreName = async (storeIdx, newVal) => {
-            const couponIdx = coupons.findIndex(c => c.id == currentStoreEditId);
-            if (couponIdx > -1 && coupons[couponIdx].stores) {
-                coupons[couponIdx].stores[storeIdx] = newVal;
-                await saveToFirestore();
-            }
-        };
-
-        function parseBackupText(text) {
-            const couponsParsed = [];
-            const entries = text.split('----------------------------------------').slice(1);  // Skip first empty if any
-            entries.forEach(entry => {
-                entry = entry.trim();
-                if (!entry) return;
-                const lines = entry.split('\n');
-                const coupon = {};
-                lines.forEach(line => {
-                    if (line.includes(':')) {
-                        const [key, value] = line.split(':', 1).map(s => s.trim());
-                        if (key === 'חנות') coupon.store = value;
-                        else if (key === 'תיאור') coupon.title = value;
-                        else if (key === 'סכום') coupon.value = parseInt(value) || 0;
-                        else if (key === 'תוקף') coupon.exp = value;
-                        else if (key === 'קוד') coupon.code = value;
-                        else if (key === 'קטגוריה') coupon.category = value;
-                        else if (key === 'קישור') coupon.link = value;
-                        else if (key === 'נעוץ') coupon.isPinned = value === 'כן';
-                        else if (key === 'רשימת סניפים') coupon.stores = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
-                        else if (key.startsWith('תמונה')) coupon.image = value;
-                    }
-                });
-                if (Object.keys(coupon).length) couponsParsed.push(coupon);
-            });
-            return couponsParsed;
+        function generateCustomText(data) {
+             return data.map(c => `----------------------------------------\nחנות: ${c.store}\nתיאור: ${c.title||''}\nסכום: ${c.value}\nתוקף: ${c.exp}\nקוד: ${c.code||''}\nקטגוריה: ${c.category}\nקישור: ${c.link||''}\nנעוץ: ${c.isPinned?'כן':'לא'}\nרשימת סניפים: ${(c.stores||[]).join(',')}\nתמונה (לא לגעת): ${c.image||''}`).join('\n');
+        }
+        function parseCustomText(text) {
+             const items = [];
+             text.split(/-{3,}/).forEach(block => {
+                 if(!block.trim()) return;
+                 let newItem = { id: Date.now() + Math.random() };
+                 block.split('\n').forEach(line => {
+                     const [key, ...rest] = line.split(':');
+                     if(!key || !rest.length) return;
+                     const val = rest.join(':').trim();
+                     if(key.trim()==='חנות') newItem.store = val;
+                     if(key.trim()==='סכום') newItem.value = parseInt(val)||0;
+                     if(key.trim()==='תוקף') newItem.exp = val;
+                     if(key.trim()==='קוד') newItem.code = val;
+                     if(key.trim()==='קטגוריה') newItem.category = val;
+                     if(key.trim()==='קישור') newItem.link = val;
+                     if(key.trim()==='רשימת סניפים') newItem.stores = val?val.split(','):[];
+                     if(key.trim()==='תמונה (לא לגעת)') newItem.image = val;
+                 });
+                 if(newItem.store) items.push(newItem);
+             });
+             return items;
         }
 
+        window.downloadData = () => {
+            const blob = new Blob([generateCustomText(coupons)], {type: "text/plain;charset=utf-8"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "qpon_backup.txt";
+            a.click();
+        };
+
+        window.triggerUpload = () => document.getElementById('importFileInput').click();
         window.handleFileImport = (event) => {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const text = e.target.result;
-                let importedCoupons;
-                if (file.type === 'application/json') {
-                    importedCoupons = JSON.parse(text);
-                } else if (file.type === 'text/plain') {
-                    importedCoupons = parseBackupText(text);
-                } else {
-                    alert('פורמט קובץ לא נתמך. נסה TXT או JSON.');
-                    return;
-                }
-                const backup = JSON.parse(JSON.stringify(coupons));
-                importedCoupons.forEach(imp => {
-                    const newId = Date.now() + Math.random();  // Unique ID
-                    coupons.push({ id: newId, isPinned: imp.isPinned || false, ...imp });
-                });
-                renderCoupons();
-                updateTotal();
-                await saveToFirestore();
-                showUndoToast('הנתונים יובאו', async () => {
-                    coupons = backup;
+                const imported = parseCustomText(e.target.result);
+                if(imported.length > 0) {
+                    coupons = [...coupons, ...imported];
                     await saveToFirestore();
-                    renderCoupons();
-                    updateTotal();
-                });
+                    alert(`נטענו ${imported.length} פריטים ושמרו לענן`);
+                }
             };
             reader.readAsText(file);
         };
 
-        // The rest of the original script from index.html remains unchanged...
-        initFirebase();
+        // UI Helpers
+        window.showUndoToast = (msg, undo) => {
+             const t = document.getElementById('undoToast');
+             document.getElementById('toastMessage').innerText = msg;
+             undoCallback = undo;
+             t.classList.remove('hidden-toast'); t.classList.add('visible-toast');
+             document.getElementById('toastProgress').style.transition = 'width 5s linear';
+             document.getElementById('toastProgress').style.width = '0%';
+             setTimeout(() => { t.classList.add('hidden-toast'); t.classList.remove('visible-toast'); document.getElementById('toastProgress').style.width='100%'; }, 5000);
+        };
+        window.triggerUndo = () => { if(undoCallback) undoCallback(); document.getElementById('undoToast').classList.add('hidden-toast'); };
+
+        // Stores Modal Logic
+        window.openStoresModal = (id) => { currentStoreEditId = id; isStoreEditMode = false; updateStoreModalUI(); document.getElementById('storesModal').classList.remove('hidden'); };
+        window.toggleStoreEditMode = () => { isStoreEditMode = !isStoreEditMode; updateStoreModalUI(); };
+        function updateStoreModalUI() {
+            const c = coupons.find(i => i.id == currentStoreEditId);
+            if(!c) return;
+            document.getElementById('storeModalTitle').innerText = c.store;
+            const list = c.stores || [c.store];
+            document.getElementById('storeListContent').innerHTML = isStoreEditMode ? 
+                list.map((s,i) => `<div class="flex gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded"><button onclick="removeStore(${i})" class="text-red-500"><i class="fas fa-times"></i></button><input value="${s}" onchange="updateStoreName(${i},this.value)" class="bg-transparent w-full"></div>`).join('') :
+                list.map(s => `<div class="p-3 bg-gray-50 dark:bg-gray-800 rounded mb-2"><i class="fas fa-check-circle text-green-500"></i> ${s}</div>`).join('');
+            document.getElementById('addStoreContainer').classList.toggle('hidden', !isStoreEditMode);
+            document.getElementById('storeSearchBar').classList.toggle('hidden', isStoreEditMode);
+        }
+        window.addNewStore = async () => { 
+            const val = document.getElementById('newStoreInput').value;
+            if(!val) return;
+            const idx = coupons.findIndex(c=>c.id==currentStoreEditId);
+            if(idx>-1) { coupons[idx].stores = [val, ...(coupons[idx].stores||[])]; await saveToFirestore(); updateStoreModalUI(); }
+        };
+        window.removeStore = async (i) => {
+            const idx = coupons.findIndex(c=>c.id==currentStoreEditId);
+            if(idx>-1) { coupons[idx].stores.splice(i,1); await saveToFirestore(); updateStoreModalUI(); }
+        };
+
+        window.checkInterception = (q) => {
+             if(q.length<2) return;
+             const m = coupons.filter(c => c.stores?.some(s=>s.includes(q)));
+             document.getElementById('interceptionResult').innerHTML = m.length ? m.map(c => `<div class="bg-white dark:bg-[#0f172a] p-4 rounded border-r-4 border-green-500 mb-2 flex justify-between"><span>${c.store}</span><span class="text-indigo-500 font-bold">₪${c.value}</span></div>`).join('') : '<div class="text-center py-4 text-gray-500">אין תוצאות</div>';
+        };
+
+        function renderCoupons() {
+            const con = document.getElementById('couponsContainer');
+            con.innerHTML = '';
+            let list = coupons.filter(c => currentCategory === 'all' || c.category === currentCategory);
+            list.sort((a, b) => (b.isPinned===true) - (a.isPinned===true)); // Sort by pinned
+            
+            if(!list.length) { con.innerHTML = `<div class="text-center py-12 opacity-50 col-span-full"><i class="fas fa-wallet text-6xl mb-4"></i><p>אין הטבות</p></div>`; return; }
+
+            list.forEach(c => {
+                const isExp = c.exp && new Date(c.exp) < new Date();
+                const html = `
+                <div class="glass p-5 rounded-3xl relative transition hover:shadow-2xl flex flex-col h-full group bg-white/50 dark:bg-[#1e293b]/60 ${c.isPinned?'pinned-card':''} ${isExp?'opacity-60 grayscale':''}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-start gap-4 flex-1 overflow-hidden">
+                            ${c.image ? `<img src="${c.image}" class="w-12 h-12 rounded-2xl object-cover shadow-sm">` : `<div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-gray-800 flex items-center justify-center text-indigo-500"><i class="fas fa-gift text-lg"></i></div>`}
+                            <div class="min-w-0 pt-0.5">
+                                <h3 class="font-bold text-lg text-gray-900 dark:text-white truncate">${c.store}</h3>
+                                ${isExp ? '<span class="text-[10px] bg-gray-600 text-white px-2 rounded">פג תוקף</span>' : ''}
+                                ${c.isPinned ? '<i class="fas fa-thumbtack text-yellow-500 text-xs"></i>' : ''}
+                            </div>
+                        </div>
+                        <button onclick="toggleMenu(${c.id})" class="text-gray-400 hover:text-indigo-500 p-2"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+                    
+                    <div id="menu-${c.id}" class="hidden absolute left-4 top-12 bg-white dark:bg-[#0f172a] shadow-xl rounded-xl z-20 w-40 border border-gray-100 dark:border-gray-700 py-1">
+                        <button onclick="openEditModal(${c.id})" class="w-full text-right px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fas fa-pen text-blue-500 ml-2"></i> ערוך</button>
+                        <button onclick="deleteCoupon(${c.id})" class="w-full text-right px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 text-red-500"><i class="fas fa-trash ml-2"></i> מחק</button>
+                    </div>
+
+                    <div class="mt-auto pt-2">
+                         <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-xs text-gray-400 mb-1 truncate max-w-[140px]">${c.title || ''}</p>
+                                <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-600 dark:text-gray-300"><i class="far fa-calendar-alt"></i> ${c.exp?new Date(c.exp).toLocaleDateString('he-IL'):'ללא תוקף'}</span>
+                                ${c.code ? `<div class="mt-2 flex items-center gap-2"><div class="text-xs font-mono text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded border border-dashed border-indigo-200 dark:border-indigo-800 select-all">${c.code}</div><button onclick="copyCode('${c.code}')"><i class="far fa-copy text-gray-400"></i></button></div>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <span class="text-3xl font-black text-indigo-600 dark:text-indigo-400">₪${c.value}</span>
+                                <div class="flex gap-1 mt-2 justify-end">
+                                    <button onclick="togglePin(${c.id})" class="w-8 h-8 rounded-full bg-yellow-50 dark:bg-yellow-900/20 text-yellow-500 flex items-center justify-center"><i class="fas fa-thumbtack text-xs"></i></button>
+                                    <button onclick="openStoresModal(${c.id})" class="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center"><i class="fas fa-store text-xs"></i></button>
+                                    ${c.link ? `<a href="${c.link}" target="_blank" class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 flex items-center justify-center"><i class="fas fa-link text-xs"></i></a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                con.innerHTML += html;
+            });
+        }
+        function updateTotal() { document.getElementById('totalValueDisplay').innerText = `₪${coupons.reduce((a,c)=>a+c.value,0).toLocaleString()}`; }
+        
+        window.startNFCScan = async () => {
+             if ('NDEFReader' in window) { try { const ndef = new NDEFReader(); await ndef.scan(); alert("קרב כרטיס..."); ndef.onreading=e=>alert("NFC: "+e.serialNumber); } catch(e){alert("NFC Error: "+e);} } else alert("NFC not supported");
+        };
+
+        init();
     </script>
 </body>
 </html>
