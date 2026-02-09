@@ -421,7 +421,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnRk-Os6EvJcFIdpl-lICc9w-E4pQ74nE",
@@ -448,6 +448,7 @@
         
         let undoCallback = null;
         let toastTimeout = null;
+        let unsubscribe = null; // משתנה לשמירת ההאזנה לשינויים
 
         function init() {
             onAuthStateChanged(auth, async (currentUserData) => {
@@ -462,13 +463,18 @@
                     userAvatar.innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
                     if(emailDisplay) emailDisplay.innerText = user.email;
                     
-                    // טעינה היברידית - קודם מקומי, אחר כך ענן
                     loadFromLocalCache(); 
-                    await loadDataFromFirestore();
+                    
+                    // הפעלת האזנה בזמן אמת - השינוי הקריטי לסנכרון אמיתי
+                    setupRealtimeListener(user);
                     
                     checkExpirations(); 
                 } else {
                     user = null;
+                    if (unsubscribe) {
+                        unsubscribe(); // ניתוק ההאזנה ביציאה
+                        unsubscribe = null;
+                    }
                     overlay.classList.remove('hidden');
                     userAvatar.classList.add('hidden');
                     coupons = [];
@@ -487,57 +493,62 @@
                     coupons = JSON.parse(cached);
                     renderCoupons();
                     updateTotal();
-                    console.log("Loaded from cache");
                 } catch(e) { console.error("Cache parse error", e); }
             }
         }
 
-        async function loadDataFromFirestore() {
-            if (!user) return;
+        // פונקציה חדשה: האזנה רציפה לשינויים בשרת
+        function setupRealtimeListener(currentUser) {
             document.getElementById('dataLoader').classList.remove('hidden');
-            try {
-                const docRef = doc(db, "wallets", user.uid);
-                const docSnap = await getDoc(docRef);
+            const docRef = doc(db, "wallets", currentUser.uid);
+            
+            // onSnapshot מאזין לכל שינוי בשרת ומעדכן את המכשיר מיידית
+            unsubscribe = onSnapshot(docRef, (docSnap) => {
+                document.getElementById('dataLoader').classList.add('hidden');
                 
-                // --- תיקון סנכרון: אם המסמך קיים בענן, הוא המקור הקובע (גם אם הוא ריק) ---
                 if (docSnap.exists()) {
                     const serverData = docSnap.data().coupons;
-                    // אם הוגדר מערך (אפילו ריק), מעדכנים לפיו
-                    if (serverData !== undefined) {
+                    // אם יש מידע בשרת, הוא הקובע! דורסים את המקומי
+                    if (serverData) {
                         coupons = serverData;
-                        localStorage.setItem(`qpon_cache_${user.uid}`, JSON.stringify(coupons));
+                        // עדכון המטמון המקומי כדי שבפעם הבאה יעלה מהר
+                        localStorage.setItem(`qpon_cache_${currentUser.uid}`, JSON.stringify(coupons));
+                        renderCoupons();
+                        updateTotal();
+                        console.log("Realtime update received from cloud");
                     }
                 } else {
-                    // אם אין מסמך בכלל (משתמש חדש לגמרי), שומרים את המצב הקיים לענן
-                    await saveToFirestore();
+                    // אם המסמך לא קיים בשרת (משתמש חדש לגמרי), ניצור אותו ריק
+                     saveToFirestore().catch(console.error);
                 }
-                renderCoupons();
-                updateTotal();
-            } catch (e) { 
-                console.error("Error loading form cloud", e);
-                // במקרה שגיאה - עדיין רואים את מה שנטען מהמטמון
-            } 
-            finally { document.getElementById('dataLoader').classList.add('hidden'); }
+            }, (error) => {
+                console.error("Sync Error:", error);
+                document.getElementById('dataLoader').classList.add('hidden');
+                alert("שגיאת סנכרון: " + error.message + "\nבדוק חיבור לאינטרנט או הרשאות.");
+            });
         }
 
         async function saveToFirestore() {
-            if (!user) return;
+            if (!user) {
+                alert("לא ניתן לשמור: המשתמש אינו מחובר.");
+                return;
+            }
             
             // שמירה למטמון מיידית
             localStorage.setItem(`qpon_cache_${user.uid}`, JSON.stringify(coupons));
             
             // שמירה לענן
             try {
-                // שימוש ב-merge: true למניעת דריסה של שדות אחרים אם קיימים
+                // שימוש ב-merge: true למניעת דריסה של שדות אחרים
                 await setDoc(doc(db, "wallets", user.uid), { 
                     coupons: coupons, 
                     lastUpdated: new Date().toISOString() 
                 }, { merge: true });
-                console.log("Saved to cloud successfully");
+                console.log("Data pushed to cloud");
             } catch (e) {
                 console.error("Cloud save failed:", e);
-                // --- תיקון: חיווי למשתמש במקרה של שגיאה ---
-                alert("שגיאה בשמירה לענן! \nייתכן שחסרות הרשאות ב-Firebase Console או שיש בעיית תקשורת.\nפרטי שגיאה: " + e.message);
+                alert("שגיאה קריטית בשמירה לענן!\n" + e.message);
+                throw e; // זורק שגיאה כדי שהפונקציה הקוראת תדע שנכשל
             }
         }
 
@@ -919,17 +930,24 @@
                 coupons.push({ id: Date.now(), isPinned: false, ...couponData });
             }
             
-            // שמירה אופטימית
+            // שמירה אופטימית לתצוגה
             renderCoupons();
             updateTotal();
             window.closeModal('addModal');
             
-            await saveToFirestore();
-
-            showUndoToast(editId ? "ההטבה עודכנה" : "ההטבה נוספה", async () => {
-                coupons = backup;
+            // שמירה לענן (שזורקת שגיאה אם נכשלת)
+            try {
                 await saveToFirestore();
-            });
+                showUndoToast(editId ? "ההטבה עודכנה" : "ההטבה נוספה", async () => {
+                    coupons = backup;
+                    await saveToFirestore();
+                });
+            } catch (err) {
+                // אם השמירה נכשלה, נחזיר את המצב לקדמותו
+                coupons = backup;
+                renderCoupons();
+                updateTotal();
+            }
         };
 
         window.deleteCoupon = async (id) => {
@@ -938,12 +956,17 @@
             
             renderCoupons(); 
             updateTotal();
-            await saveToFirestore();
             
-            showUndoToast("ההטבה נמחקה", async () => {
-                coupons = backup;
+            try {
                 await saveToFirestore();
-            });
+                showUndoToast("ההטבה נמחקה", async () => {
+                    coupons = backup;
+                    await saveToFirestore();
+                });
+            } catch (err) {
+                 coupons = backup;
+                 renderCoupons();
+            }
         };
 
         window.copyCode = (code) => {
